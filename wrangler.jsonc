@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "b5",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-07-23" // <--- CHANGE THIS DATE TO THE CURRENT UTC DATE OR EARLIER
+}
