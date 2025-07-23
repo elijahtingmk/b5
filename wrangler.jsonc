@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
-  "name": "b5", // <--- IMPORTANT: Change this to a unique name for your Worker
+  "name": "elijah-ting.workers.dev", // <--- IMPORTANT: Change this to a unique name for your Worker
   "main": "src/index.ts", // This now matches the file you just created
   "compatibility_date": "2025-07-24" // <--- IMPORTANT: Use today's date (July 24, 2025)
 }
