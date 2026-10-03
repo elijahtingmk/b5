@@ -17,7 +17,7 @@ export type DbResult = {
   lang: string;
   invalid: boolean;
   timeElapsed: number;
-  dateStamp: string;
+  dateStamp: string | Date;
   answers: Answer[];
 };
 

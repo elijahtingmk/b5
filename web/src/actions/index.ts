@@ -1,8 +1,9 @@
 'use server';
 
-import { connectToDatabase } from '@/db';
-import { ObjectId } from 'mongodb';
+import { getDb, newId } from '@/db';
 import { B5Error, DbResult, Feedback } from '@/types';
+import { testSchema } from '@/schemas';
+import { validId } from '@/lib/helpers';
 import calculateScore from '@bigfive-org/score';
 import generateResult, {
   getInfo,
@@ -10,7 +11,6 @@ import generateResult, {
   Domain
 } from '@bigfive-org/results';
 
-const collectionName = process.env.DB_COLLECTION || 'results';
 const resultLanguages = getInfo().languages;
 
 export type Report = {
@@ -27,10 +27,21 @@ export async function getTestResult(
 ): Promise<Report | undefined> {
   'use server';
   try {
-    const query = { _id: new ObjectId(id) };
-    const db = await connectToDatabase();
-    const collection = db.collection(collectionName);
-    const report = await collection.findOne(query);
+    const normalizedId = id.toLowerCase();
+    const db = await getDb();
+    const report = validId(normalizedId)
+      ? await db
+          .prepare(
+            'SELECT id, lang, date_stamp, answers FROM results WHERE id = ?'
+          )
+          .bind(normalizedId)
+          .first<{
+            id: string;
+            lang: string;
+            date_stamp: string;
+            answers: string;
+          }>()
+      : null;
     if (!report) {
       console.error(`The test results with id ${id} are not found!`);
       throw new B5Error({
@@ -41,11 +52,11 @@ export async function getTestResult(
     const selectedLanguage =
       language ||
       (!!resultLanguages.find((l) => l.id == report.lang) ? report.lang : 'en');
-    const scores = calculateScore({ answers: report.answers });
+    const scores = calculateScore({ answers: JSON.parse(report.answers) });
     const results = generateResult({ lang: selectedLanguage, scores });
     return {
-      id: report._id.toString(),
-      timestamp: report.dateStamp,
+      id: report.id,
+      timestamp: Date.parse(report.date_stamp),
       availableLanguages: resultLanguages,
       language: selectedLanguage,
       results
@@ -54,6 +65,7 @@ export async function getTestResult(
     if (error instanceof B5Error) {
       throw error;
     }
+    console.error(error);
     throw new Error('Something wrong happend. Failed to get test result!');
   }
 }
@@ -61,10 +73,25 @@ export async function getTestResult(
 export async function saveTest(testResult: DbResult) {
   'use server';
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection(collectionName);
-    const result = await collection.insertOne(testResult);
-    return { id: result.insertedId.toString() };
+    const test = testSchema.parse(testResult);
+    const id = newId();
+    const db = await getDb();
+    await db
+      .prepare(
+        `INSERT INTO results (id, test_id, lang, invalid, time_elapsed, date_stamp, answers)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        id,
+        test.testId,
+        test.lang,
+        test.invalid ? 1 : 0,
+        Math.round(test.timeElapsed),
+        test.dateStamp.toISOString(),
+        JSON.stringify(test.answers)
+      )
+      .run();
+    return { id };
   } catch (error) {
     console.error(error);
     throw new B5Error({
@@ -90,9 +117,15 @@ export async function saveFeedback(
     message: String(formData.get('message'))
   };
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection('feedback');
-    await collection.insertOne({ feedback });
+    const db = await getDb();
+    await db
+      .prepare('INSERT INTO feedback (name, email, message) VALUES (?, ?, ?)')
+      .bind(
+        feedback.name.slice(0, 200),
+        feedback.email.slice(0, 200),
+        feedback.message.slice(0, 5000)
+      )
+      .run();
     return {
       message: 'Sent successfully!',
       type: 'success'

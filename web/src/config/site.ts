@@ -2,7 +2,8 @@ import { getTranslations } from 'next-intl/server';
 
 export type SiteConfig = typeof siteConfig;
 
-export const basePath = 'https://bigfive-test.com';
+export const basePath =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://bigfive-test.com';
 
 export const supportEmail = 'bigfive-test@rubynor.com';
 

@@ -1,3 +1,4 @@
+import { use } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@nextui-org/link';
 import { button as buttonStyles } from '@nextui-org/theme';
@@ -19,17 +20,21 @@ import { allPosts } from 'contentlayer/generated';
 import { PostCard } from '@/components/post-card';
 import { SonarPulse } from '@/components/sonar-pulse';
 import { Button } from '@nextui-org/button';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { Chip, Tooltip } from '@nextui-org/react';
 import NextLink from 'next/link';
 import { Translated } from '@/components/translated';
 
 interface Props {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }
 
-export default function Home({ params: { locale } }: Props) {
-  unstable_setRequestLocale(locale);
+export default function Home(props: Props) {
+  const params = use(props.params);
+
+  const { locale } = params;
+
+  setRequestLocale(locale);
   const t = useTranslations('frontpage');
   const f = useTranslations('facets');
 

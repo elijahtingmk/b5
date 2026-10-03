@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "b5",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      // Self-reference, required by OpenNext. Must match "name" above.
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "b5"
+    }
+  ],
+  "d1_databases": [
+    {
+      // Test results, feedback and article view counts.
+      // No database_id: `wrangler deploy` creates "b5-results" on the first
+      // deploy and reuses it (looked up by name) on every deploy after that.
+      "binding": "DB",
+      "database_name": "b5-results",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

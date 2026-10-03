@@ -13,54 +13,49 @@ The frontend is written in [nodejs](https://nodejs.org) using the
 
 ## Installation
 
-Download and install [nodejs](https://nodejs.org),
-[git](https://git-scm.com/downloads) and [vercel-cli](https://vercel.com/download)
-
-Install [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable)
+Install [nodejs](https://nodejs.org) (20 or newer) and [pnpm](https://pnpm.io).
 
 ```
-npm install --global yarn
+pnpm install
 ```
 
-Install docker and docker-compose
-
-The results are saved to a [mongodb](https://www.mongodb.com/) database, so for a full test you either need a running mongodb or an instance at [mlab](https://mlab.com/)
+Test results are stored in [Cloudflare D1](https://developers.cloudflare.com/d1/).
+Locally, wrangler keeps a SQLite copy of the database in `.wrangler/`, so no
+account or database server is needed for development.
 
 ## Development
 
-add .env.local file
+Create the local database tables (once, and again after adding a migration):
 
 ```
-NEXT_PUBLIC_ENV=development
-DB_URL=mongodb://root:example@localhost:27017
-DB_NAME=b5
-DB_COLLECTION=results
+pnpm run db:migrate:local
 ```
 
-Run the setup script to install all dependencies
+Run the development server:
 
 ```
-yarn
+pnpm dev
 ```
 
-Start mongodb server
+To show a "Skip to end" button on the test page, put
+`NEXT_PUBLIC_ENV=development` in `.env.local`.
+
+To try the production build in the real Workers runtime:
 
 ```
-docker-compose up -d
+pnpm run preview
 ```
 
-Run the development server
+## Deployment
 
-```
-yarn dev
-```
+See the [main README](../README.md#hosting-on-cloudflare).
 
 ## Linting
 
 Run the linter
 
 ```
-yarn lint && yarn format:fix
+pnpm lint && pnpm format:fix
 ```
 
 ## License
