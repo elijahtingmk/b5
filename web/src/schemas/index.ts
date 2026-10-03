@@ -1,22 +1,22 @@
 import { z } from 'zod';
 
 export const testSchema = z.object({
-  testId: z.string(),
-  lang: z.string(),
+  testId: z.string().max(32),
+  lang: z.string().max(16),
   invalid: z.boolean(),
   answers: z
     .array(
       z.object({
-        id: z.string(),
-        answer: z.string(),
-        domain: z.string(),
-        facet: z.number(),
-        score: z.number()
+        id: z.string().max(64),
+        score: z.number().int().min(1).max(5),
+        domain: z.string().max(8),
+        facet: z.number().int().min(1).max(6)
       })
     )
-    .nonempty(),
-  timeElapsed: z.number(),
-  dateStamp: z.date()
+    .nonempty()
+    .max(500),
+  timeElapsed: z.number().nonnegative(),
+  dateStamp: z.coerce.date()
 });
 
 export const testId = z.object({

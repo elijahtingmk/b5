@@ -5,9 +5,9 @@ import { DomainComparePage } from './domain';
 import { BarChartCompare } from '@/components/bar-chart-generic';
 
 interface ComparePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 type Person = {
@@ -15,9 +15,11 @@ type Person = {
   name: string;
 };
 
-export default async function ComparePage({
-  params: { id }
-}: ComparePageProps) {
+export default async function ComparePage(props: ComparePageProps) {
+  const params = await props.params;
+
+  const { id } = params;
+
   const people: Person[] = base64url.decode(id);
   const reports = await Promise.all(
     people.map(async (person) => {

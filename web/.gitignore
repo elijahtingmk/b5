@@ -36,3 +36,8 @@ next-env.d.ts
 
 # contentlayer
 .contentlayer
+
+# cloudflare
+/.open-next/
+/.wrangler/
+.dev.vars*

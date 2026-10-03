@@ -1,14 +1,19 @@
+import { use } from 'react';
 import { title } from '@/components/primitives';
 import { useTranslations } from 'next-intl';
 import { GetResultPage } from './get-result';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 
 interface Props {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }
 
-export default function ResultPage({ params: { locale } }: Props) {
-  unstable_setRequestLocale(locale);
+export default function ResultPage(props: Props) {
+  const params = use(props.params);
+
+  const { locale } = params;
+
+  setRequestLocale(locale);
   const t = useTranslations('getResult');
 
   return (

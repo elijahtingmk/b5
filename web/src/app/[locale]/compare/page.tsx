@@ -1,19 +1,24 @@
 import { title } from '@/components/primitives';
 import { useTranslations } from 'next-intl';
 import { ComparePeople } from './compare-people';
-import { unstable_setRequestLocale } from 'next-intl/server';
-import { Suspense } from 'react';
+import { setRequestLocale } from 'next-intl/server';
+import { Suspense, use } from 'react';
 
 interface Props {
-  params: { locale: string };
-  searchParams: { id: string };
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ id: string }>;
 }
 
-export default function ComparePage({
-  params: { locale },
-  searchParams: { id }
-}: Props) {
-  unstable_setRequestLocale(locale);
+export default function ComparePage(props: Props) {
+  const searchParams = use(props.searchParams);
+
+  const { id } = searchParams;
+
+  const params = use(props.params);
+
+  const { locale } = params;
+
+  setRequestLocale(locale);
   const t = useTranslations('getCompare');
   return (
     <div className='h-[calc(60vh)]'>

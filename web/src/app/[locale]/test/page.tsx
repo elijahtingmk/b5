@@ -1,22 +1,28 @@
+import { use } from 'react';
 import { getItems, getInfo } from '@bigfive-org/questions';
 import { Survey } from './survey';
 import { useTranslations } from 'next-intl';
 import { saveTest } from '@/actions';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { TestLanguageSwitch } from './test-language-switch';
 
 const questionLanguages = getInfo().languages;
 
 interface Props {
-  params: { locale: string };
-  searchParams: { lang?: string };
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }
 
-export default function TestPage({
-  params: { locale },
-  searchParams: { lang }
-}: Props) {
-  unstable_setRequestLocale(locale);
+export default function TestPage(props: Props) {
+  const searchParams = use(props.searchParams);
+
+  const { lang } = searchParams;
+
+  const params = use(props.params);
+
+  const { locale } = params;
+
+  setRequestLocale(locale);
   const language =
     lang || (questionLanguages.some((l) => l.id === locale) ? locale : 'en');
   const questions = getItems(language);

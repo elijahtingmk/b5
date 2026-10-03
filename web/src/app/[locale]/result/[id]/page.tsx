@@ -14,11 +14,13 @@ import ShareBar from '@/components/share-bar';
 import { DomainTabs } from './domain-tabs';
 import { Chip } from '@nextui-org/react';
 
-export async function generateMetadata({
-  params: { locale }
-}: {
-  params: { locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale, namespace: 'results' });
   return {
     title: t('seo.title'),
@@ -27,14 +29,13 @@ export async function generateMetadata({
 }
 
 interface ResultPageParams {
-  params: { id: string };
-  searchParams: { lang: string; showExpanded?: boolean };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ lang: string; showExpanded?: boolean }>;
 }
 
-export default async function ResultPage({
-  params,
-  searchParams
-}: ResultPageParams) {
+export default async function ResultPage(props: ResultPageParams) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   let report;
 
   try {

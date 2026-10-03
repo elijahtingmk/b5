@@ -8,10 +8,9 @@ import Footer from '@/components/footer';
 import { ThemeProviderProps } from 'next-themes/dist/types';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { basePath, getNavItems, locales, siteConfig } from '@/config/site';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
-import { Analytics } from '@vercel/analytics/react';
-import useTextDirection from '@/hooks/use-text-direction';
+import { isRtlLang } from 'rtl-detect';
 import Script from 'next/script';
 import CookieBanner from '@/components/cookie-consent';
 
@@ -19,11 +18,13 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({
-  params: { locale }
-}: {
-  params: { locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale, namespace: 'frontpage' });
   const s = await getTranslations({ locale, namespace: 'seo' });
   const alternatesLang = locales.reduce((a, v) => ({ ...a, [v]: `/${v}` }), {});
@@ -40,7 +41,7 @@ export async function generateMetadata({
       shortcut: '/favicon-16x16.png',
       apple: '/apple-touch-icon.png'
     },
-    metadataBase: new URL('https://bigfive-test.com'),
+    metadataBase: new URL(basePath),
     // alternates: {
     //   canonical: '/',
     //   languages: alternatesLang
@@ -78,16 +79,19 @@ export const viewport: Viewport = {
   ]
 };
 
-export default async function RootLayout({
-  children,
-  params: { locale }
-}: {
+export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
+  const { children } = props;
+
   const gaId = process.env.NEXT_PUBLIC_ANALYTICS_ID || '';
-  unstable_setRequestLocale(locale);
-  const direction = useTextDirection(locale);
+  setRequestLocale(locale);
+  const direction = isRtlLang(locale) ? 'rtl' : 'ltr';
 
   const navItems = await getNavItems({ locale, linkType: 'navItems' });
   const navMenuItems = await getNavItems({ locale, linkType: 'navMenuItems' });
@@ -116,11 +120,7 @@ export default async function RootLayout({
             <Footer footerLinks={footerLinks} />
           </div>
         </Providers>
-        <Script
-          src='https://bigfive-test.com/sw.js'
-          strategy='beforeInteractive'
-        />
-        <Analytics />
+        <Script src='/sw.js' strategy='beforeInteractive' />
       </body>
       <GoogleAnalytics gaId={gaId} />
     </html>
