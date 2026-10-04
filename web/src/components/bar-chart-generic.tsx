@@ -1,5 +1,7 @@
 'use client';
 
+import { chartColors } from '@/config/chart-colors';
+
 import { ApexOptions } from 'apexcharts';
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
@@ -24,6 +26,7 @@ export const BarChartCompare = ({
   const { theme } = useTheme();
   const apexChartTheme = theme === 'dark' ? 'dark' : 'light';
   const options: ApexOptions = {
+    colors: chartColors,
     theme: {
       mode: apexChartTheme
     },
@@ -34,7 +37,7 @@ export const BarChartCompare = ({
       toolbar: {
         show: false
       },
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'var(--font-sans), sans-serif',
       background: 'transparent'
     },
     yaxis: {
@@ -44,7 +47,7 @@ export const BarChartCompare = ({
       categories,
       labels: {
         style: {
-          fontFamily: 'Inter, sans-serif'
+          fontFamily: 'var(--font-sans), sans-serif'
         }
       }
     },

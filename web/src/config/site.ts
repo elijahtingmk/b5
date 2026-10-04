@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 export type SiteConfig = typeof siteConfig;
 
 export const basePath =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://bigfive-test.com';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://big5.drelijah.org';
 
 export const supportEmail = 'elijah@drelijah.org';
 
@@ -55,7 +55,7 @@ export const languages: Language[] = [
 export const locales = languages.map((lang) => lang.code) as string[];
 
 export const siteConfig = {
-  name: 'Big Five Personality Test',
+  name: 'Big Five Snapshot · drelijah.org',
   creator: 'Elijah Ting, ED – L&D',
   description:
     'Learn to know yourself better with a free, open-source personality test.',

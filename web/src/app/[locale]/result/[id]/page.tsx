@@ -96,7 +96,7 @@ const Results = ({ report, showExpanded, locale }: ResultsProps) => {
       <div className='flex mt-4'>
         <Snippet
           hideSymbol
-          color='danger'
+          color='primary'
           className='w-full justify-center'
           size='lg'
         >

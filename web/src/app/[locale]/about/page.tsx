@@ -17,10 +17,10 @@ export async function generateMetadata(props: {
 
   const { locale } = params;
 
-  const t = await getTranslations({ locale, namespace: 'about' });
+  const t = await getTranslations({ locale, namespace: 'toolbar' });
   return {
-    title: t('seo.title'),
-    description: t('seo.description')
+    title: t('about'),
+    description: `A free Big Five personality snapshot offered by ${practitioner.name}, ${practitioner.location}.`
   };
 }
 
@@ -78,7 +78,7 @@ export default async function AboutPage(props: Props) {
           <h2 className={title()}>We love feedback!&nbsp;</h2>
           <div className='flex md:inline-flex flex-col md:flex-row items-center'>
             <HeartBoldIcon
-              className='text-pink-500 animate-heartbeat'
+              className='text-brand-gold animate-heartbeat'
               size={50}
               style={{
                 animationDuration: '2.5s'

@@ -96,12 +96,22 @@ The notice also says contact details are kept for up to two years after the
 last contact. If you change the wording on the results page or the privacy
 page, update `NOTICE_VERSION` in `web/src/config/consent.ts`.
 
+### Branding
+
+Colours and fonts follow drelijah.org (navy `#0c1424`, gold `#c4964a`,
+Newsreader and Source Sans 3). They are set in `web/tailwind.config.js` and
+`web/src/config/fonts.ts`; chart colours are in `web/src/config/chart-colors.ts`.
+The articles under `web/posts` were written by Jonas Enge for the original
+project and keep his byline.
+
 ### Optional settings
 
-- `NEXT_PUBLIC_SITE_URL`: your site's public URL (for example
-  `https://b5.example.workers.dev`), used in page metadata and the sitemap. Set
-  it as a **build** variable. Share and copy-link buttons always use the
-  address the visitor is on, so they work without it.
+- **Custom domain.** The site expects to live at `https://big5.drelijah.org`
+  (used in page metadata, the sitemap and link previews). Point it there with
+  **Workers & Pages → b5 → Settings → Domains & Routes → Add → Custom domain**.
+  To use a different address, set `NEXT_PUBLIC_SITE_URL` as a **build**
+  variable. Share and copy-link buttons always use the address the visitor is
+  on.
 - `NEXT_PUBLIC_ANALYTICS_ID`: a Google Analytics ID, if you want one. The
   privacy notice currently says the site uses no analytics cookies, so update
   it before turning this on.

@@ -71,13 +71,6 @@ export default function Home(props: Props) {
     )
   });
 
-  const testsTaken = t.rich('tests_taken', {
-    green: (chunks) => (
-      <span className={title({ color: 'green' })}>{chunks}</span>
-    ),
-    n: '4.000.000'
-  });
-
   return (
     <section className='relative'>
       <div>
@@ -135,13 +128,7 @@ export default function Home(props: Props) {
         </div>
       </div>
 
-      <section className='border-t border-b border-divider px-8 mt-16 lg:mt-44 text-center'>
-        <div className='my-8'>
-          <h1 className={title()}>{testsTaken}</h1>
-        </div>
-      </section>
-
-      <div className='mt-20 text-center'>
+      <div className='mt-20 lg:mt-44 text-center'>
         <h1 className={title()}>{t('compare.title')}</h1>
 
         <div className='mt-10'>

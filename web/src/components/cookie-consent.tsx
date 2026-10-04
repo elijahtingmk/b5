@@ -72,7 +72,7 @@ export default function CookieBanner() {
               </Button>
             </div>
             <Button
-              color='danger'
+              color='default'
               variant='light'
               onPress={handleDeclineCookies}
             >

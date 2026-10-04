@@ -1,5 +1,7 @@
 'use client';
 
+import { chartColors } from '@/config/chart-colors';
+
 import { ApexOptions } from 'apexcharts';
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
@@ -24,7 +26,7 @@ export const BarChart = ({ max, results }: BarChartProps) => {
       toolbar: {
         show: false
       },
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'var(--font-sans), sans-serif',
       background: 'transparent'
     },
     yaxis: {
@@ -34,7 +36,7 @@ export const BarChart = ({ max, results }: BarChartProps) => {
       categories: results.map((result: any) => result.title),
       labels: {
         style: {
-          fontFamily: 'Inter, sans-serif'
+          fontFamily: 'var(--font-sans), sans-serif'
         }
       }
     },
@@ -44,7 +46,7 @@ export const BarChart = ({ max, results }: BarChartProps) => {
       }
     },
     fill: {
-      colors: ['#9353d3', '#006FEE', '#f31260', '#f5a524', '#17c964', '#E2711D']
+      colors: chartColors
     }
   };
 

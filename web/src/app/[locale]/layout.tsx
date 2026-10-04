@@ -1,6 +1,6 @@
 import '@/styles/globals.css';
 import { Metadata, Viewport } from 'next';
-import { fontSans } from '@/config/fonts';
+import { fontSans, fontSerif } from '@/config/fonts';
 import { Providers } from '../providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
@@ -30,15 +30,17 @@ export async function generateMetadata(props: {
   const alternatesLang = locales.reduce((a, v) => ({ ...a, [v]: `/${v}` }), {});
   return {
     title: {
-      default: t('seo.title'),
-      template: `%s - ${t('seo.title')}`
+      default: `${t('title')} · drelijah.org`,
+      template: `%s · drelijah.org`
     },
     description: t('seo.description'),
     keywords: s('keywords'),
     authors: [{ name: siteConfig.creator, url: siteConfig.links.practice }],
     icons: {
-      icon: '/favicon.ico',
-      shortcut: '/favicon-16x16.png',
+      icon: [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon.ico', sizes: '32x32' }
+      ],
       apple: '/apple-touch-icon.png'
     },
     metadataBase: new URL(basePath),
@@ -53,7 +55,7 @@ export async function generateMetadata(props: {
       description: t('seo.description'),
       images: {
         url: `${basePath}/og-image.png`,
-        alt: 'People comparing personality tests'
+        alt: 'Big Five Snapshot by Elijah Ting, drelijah.org'
       }
     },
     twitter: {
@@ -64,7 +66,7 @@ export async function generateMetadata(props: {
       creator: siteConfig.creator,
       images: {
         url: `${basePath}/og-image.png`,
-        alt: 'People comparing personality tests'
+        alt: 'Big Five Snapshot by Elijah Ting, drelijah.org'
       }
     }
   };
@@ -74,8 +76,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' }
+    { media: '(prefers-color-scheme: light)', color: '#fbf8f3' },
+    { media: '(prefers-color-scheme: dark)', color: '#0c1424' }
   ]
 };
 
@@ -103,7 +105,8 @@ export default async function RootLayout(props: {
       <body
         className={clsx(
           'min-h-screen bg-background font-sans antialiased',
-          fontSans.variable
+          fontSans.variable,
+          fontSerif.variable
         )}
       >
         <Providers

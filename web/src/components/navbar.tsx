@@ -66,7 +66,7 @@ export const Navbar = ({ navItems, navMenuItems }: NavbarProps) => {
               <NextLink
                 className={clsx(
                   linkStyles({ color: 'foreground' }),
-                  'data-[active=true]:text-danger data-[active=true]:font-medium'
+                  'data-[active=true]:text-brand-copper dark:data-[active=true]:text-brand-gold data-[active=true]:font-medium'
                 )}
                 data-active={isCurrentPath(item.href)}
                 color='foreground'
@@ -89,7 +89,7 @@ export const Navbar = ({ navItems, navMenuItems }: NavbarProps) => {
             href={siteConfig.links.practice}
             className='text-default-500 text-small'
           >
-            drelijah.org
+            Main site ↗
           </Link>
           <ThemeSwitch />
         </NavbarItem>
@@ -122,7 +122,7 @@ export const Navbar = ({ navItems, navMenuItems }: NavbarProps) => {
                 data-active={isCurrentPath(item.href)}
                 className={clsx(
                   linkStyles({ color: 'foreground' }),
-                  'data-[active=true]:text-danger data-[active=true]:font-medium !text-3xl py-2'
+                  'data-[active=true]:text-brand-copper dark:data-[active=true]:text-brand-gold data-[active=true]:font-medium !text-3xl py-2'
                 )}
               >
                 {item.label}
