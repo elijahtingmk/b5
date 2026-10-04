@@ -69,13 +69,35 @@ Tables:
 - `feedback`: the form on the About page.
 - `views`: article view counts.
 
-### Exporting to Excel
+### Private download page
+
+`https://big5.drelijah.org/admin` shows how many results, enquiries and
+feedback messages there are, with a **Download CSV** button for each. Files
+open in Excel.
+
+It is switched off until you set a password:
+
+1. Choose a long password, at least 16 characters. A short phrase of four or
+   five random words works well. Store it in your password manager.
+2. In Cloudflare, open **Workers & Pages → b5 → Settings → Variables and
+   Secrets → Add variable**, choose type **Secret**, name it
+   `ADMIN_PASSWORD`, paste the password and click **Deploy**.
+3. Open `/admin`. Your browser asks for a username and password: type anything
+   as the username and your password as the password.
+
+To sign out, close the browser window. To lock the page again, delete the
+`ADMIN_PASSWORD` secret. Downloads contain personal data; delete them when you
+are done. Text that visitors typed is neutralised so Excel cannot run it as a
+formula.
+
+### Exporting from the command line
 
 From the `web` folder, after `npx wrangler login`:
 
 ```
 pnpm run export:results   # results.csv: one row per test with the five trait scores (24-120)
 pnpm run export:leads     # leads.csv: name, email, role, consent wording, linked result
+pnpm run export:feedback  # feedback.csv
 ```
 
 The CSV files contain personal data. They are git-ignored; keep them off shared

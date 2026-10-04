@@ -1,3 +1,4 @@
 User-Agent: *
 Allow: /
+Disallow: /admin
 Sitemap: https://big5.drelijah.org/sitemap.xml

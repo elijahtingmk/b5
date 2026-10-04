@@ -14,7 +14,8 @@
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "export:results": "node scripts/export-csv.mjs results",
-    "export:leads": "node scripts/export-csv.mjs leads"
+    "export:leads": "node scripts/export-csv.mjs leads",
+    "export:feedback": "node scripts/export-csv.mjs feedback"
   },
   "dependencies": {
     "@bigfive-org/questions": "1.3.3",
