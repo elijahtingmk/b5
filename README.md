@@ -69,6 +69,17 @@ Tables:
 - `feedback`: the form on the About page.
 - `views`: article view counts.
 
+### Scoping-call form on drelijah.org
+
+The contact page on drelijah.org posts to `https://big5.drelijah.org/api/enquiry`.
+The endpoint only accepts posts from `https://drelijah.org` (and `www.`), saves
+them in the `enquiries` table, sends a Telegram alert, and redirects back to
+`drelijah.org/contact?sent=1#book` (or `?error=…`). Bot traps: a hidden field and
+a minimum fill time of three seconds. To add Cloudflare Turnstile, create a widget
+for drelijah.org, set its secret as the Worker secret `TURNSTILE_SECRET`, and put
+its site key in the form's `data-turnstile-sitekey` on drelijah.org. Requests
+appear on the admin page and via `pnpm run export:enquiries`.
+
 ### Private download page
 
 `https://big5.drelijah.org/admin` shows how many results, enquiries and

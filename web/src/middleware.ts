@@ -13,7 +13,8 @@ export const config = {
   matcher: [
     '/',
     '/(en|ar|de|es|fr|id|it|no|pt|sv|uk|da|fi|hi|is|ja|pl|ru|th|zh)/:path*',
-    // /admin is a password-protected area outside the translated pages.
-    '/((?!admin|_next|_vercel|.*\\..*).*)'
+    // /admin (password-protected) and /api (form endpoints) sit outside
+    // the translated pages.
+    '/((?!admin|api|_next|_vercel|.*\\..*).*)'
   ]
 };

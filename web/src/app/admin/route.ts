@@ -15,7 +15,8 @@ export async function GET(request: Request) {
     .prepare(
       `SELECT (SELECT count(*) FROM results) AS results,
               (SELECT count(*) FROM leads) AS leads,
-              (SELECT count(*) FROM feedback) AS feedback`
+              (SELECT count(*) FROM feedback) AS feedback,
+              (SELECT count(*) FROM enquiries) AS enquiries`
     )
     .first<Record<string, number>>();
 

@@ -18,12 +18,16 @@ export const exportQueries = {
       notice_version, contact_consent_text, result_consent_text
     FROM leads ORDER BY created_at DESC`,
   feedback: `SELECT created_at, name, email, message
-    FROM feedback ORDER BY created_at DESC`
+    FROM feedback ORDER BY created_at DESC`,
+  enquiries: `SELECT created_at, name, email, phone, organisation, need, size,
+      hrd_corp, message, source_page, notice_version
+    FROM enquiries ORDER BY created_at DESC`
 } as const;
 
 export type ExportTable = keyof typeof exportQueries;
 
 export const exportTables: { id: ExportTable; label: string }[] = [
+  { id: 'enquiries', label: 'Scoping-call requests (drelijah.org)' },
   { id: 'results', label: 'Test results (with trait scores)' },
   { id: 'leads', label: 'Enquiries (people who left their details)' },
   { id: 'feedback', label: 'Feedback messages' }
