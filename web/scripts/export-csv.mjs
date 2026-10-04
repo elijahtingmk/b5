@@ -26,7 +26,10 @@ const queries = {
       l.notice_version, l.contact_consent_text, l.result_consent_text
     FROM leads l ORDER BY l.created_at DESC`,
   feedback: `SELECT created_at, name, email, message
-    FROM feedback ORDER BY created_at DESC`
+    FROM feedback ORDER BY created_at DESC`,
+  enquiries: `SELECT created_at, name, email, phone, organisation, need, size,
+      hrd_corp, message, source_page, notice_version
+    FROM enquiries ORDER BY created_at DESC`
 };
 
 const [table, ...flags] = process.argv.slice(2);
