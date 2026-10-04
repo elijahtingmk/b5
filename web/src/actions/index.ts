@@ -9,6 +9,8 @@ import {
   resultConsentText
 } from '@/config/consent';
 import { validId } from '@/lib/helpers';
+import { notifyOwner } from '@/lib/notify';
+import { leadRoles } from '@/config/consent';
 import calculateScore from '@bigfive-org/score';
 import generateResult, {
   getInfo,
@@ -131,6 +133,15 @@ export async function saveFeedback(
         feedback.message.slice(0, 5000)
       )
       .run();
+    await notifyOwner(
+      [
+        'New feedback on big5.drelijah.org',
+        `Name: ${feedback.name.slice(0, 200)}`,
+        `Email: ${feedback.email.slice(0, 200)}`,
+        '',
+        feedback.message.slice(0, 1500)
+      ].join('\n')
+    );
     return {
       message: 'Sent successfully!',
       type: 'success'
@@ -193,6 +204,17 @@ export async function saveLead(
         NOTICE_VERSION
       )
       .run();
+    const roleLabel =
+      leadRoles.find((role) => role.id === lead.role)?.label ?? 'Not given';
+    await notifyOwner(
+      [
+        'New enquiry on big5.drelijah.org',
+        `Name: ${lead.name}`,
+        `Email: ${lead.email}`,
+        `Role: ${roleLabel}`,
+        `Result shared: ${shareResult ? `yes (${lead.resultId})` : 'no'}`
+      ].join('\n')
+    );
     return {
       status: 'success',
       message: 'Thank you. Elijah will be in touch by email.'

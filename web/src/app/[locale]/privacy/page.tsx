@@ -101,6 +101,12 @@ export default function PrivacyPage() {
             with Cloudflare, which may hold it on servers outside Malaysia.
           </p>
           <p>
+            When you leave your details or send feedback, your name, email,
+            selected role and message are sent to Elijah through Telegram as a
+            notification. Telegram may process this outside Malaysia. Test
+            scores are not included in these notifications.
+          </p>
+          <p>
             Anyone who has your result ID or link can open your result page, so
             share it only with people you choose.
           </p>
@@ -193,6 +199,13 @@ export default function PrivacyPage() {
             atau sesiapa pun, dan butiran anda tidak dijual. Data disimpan
             dengan Cloudflare, yang mungkin menyimpannya di pelayan di luar
             Malaysia.
+          </p>
+          <p>
+            Apabila anda meninggalkan butiran atau menghantar maklum balas,
+            nama, e-mel, peranan yang dipilih dan mesej anda dihantar kepada
+            Elijah melalui Telegram sebagai pemberitahuan. Telegram mungkin
+            memprosesnya di luar Malaysia. Skor ujian tidak disertakan dalam
+            pemberitahuan ini.
           </p>
           <p>
             Sesiapa yang mempunyai ID atau pautan keputusan anda boleh membuka
