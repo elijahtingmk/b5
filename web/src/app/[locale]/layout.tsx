@@ -35,7 +35,7 @@ export async function generateMetadata(props: {
     },
     description: t('seo.description'),
     keywords: s('keywords'),
-    authors: [{ name: 'Jonas Enge', url: 'https://bigfive-test.com' }],
+    authors: [{ name: siteConfig.creator, url: siteConfig.links.practice }],
     icons: {
       icon: '/favicon.ico',
       shortcut: '/favicon-16x16.png',
@@ -122,7 +122,7 @@ export default async function RootLayout(props: {
         </Providers>
         <Script src='/sw.js' strategy='beforeInteractive' />
       </body>
-      <GoogleAnalytics gaId={gaId} />
+      {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>
   );
 }

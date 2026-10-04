@@ -12,7 +12,9 @@
     "preview": "opennextjs-cloudflare build && pnpm run db:migrate:local && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy && pnpm run db:migrate:remote",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
-    "db:migrate:remote": "wrangler d1 migrations apply DB --remote"
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "export:results": "node scripts/export-csv.mjs results",
+    "export:leads": "node scripts/export-csv.mjs leads"
   },
   "dependencies": {
     "@bigfive-org/questions": "1.3.3",
