@@ -7,7 +7,6 @@ import clsx from 'clsx';
 import { FeaturesGrid } from '@/components/features-grid';
 import {
   ExperimentIcon,
-  GithubIcon,
   LanguageIcon,
   LogosOpensource,
   MoneyIcon,
@@ -119,10 +118,9 @@ export default function Home(props: Props) {
                   }),
                   'md:w-auto'
                 )}
-                href={siteConfig.links.github}
+                href={siteConfig.links.practice}
               >
-                <GithubIcon size={20} />
-                GitHub
+                Coaching with Elijah Ting
               </Link>
             </div>
           </div>

@@ -12,6 +12,7 @@ import { Alert } from '@/components/alert';
 import { supportEmail } from '@/config/site';
 import ShareBar from '@/components/share-bar';
 import { DomainTabs } from './domain-tabs';
+import { LeadForm } from './lead-form';
 import { Chip } from '@nextui-org/react';
 
 export async function generateMetadata(props: {
@@ -29,7 +30,7 @@ export async function generateMetadata(props: {
 }
 
 interface ResultPageParams {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
   searchParams: Promise<{ lang: string; showExpanded?: boolean }>;
 }
 
@@ -54,15 +55,22 @@ export default async function ResultPage(props: ResultPageParams) {
       </Alert>
     );
 
-  return <Results report={report} showExpanded={searchParams.showExpanded} />;
+  return (
+    <Results
+      report={report}
+      showExpanded={searchParams.showExpanded}
+      locale={params.locale}
+    />
+  );
 }
 
 interface ResultsProps {
   report: Report;
   showExpanded?: boolean;
+  locale: string;
 }
 
-const Results = ({ report, showExpanded }: ResultsProps) => {
+const Results = ({ report, showExpanded, locale }: ResultsProps) => {
   const t = useTranslations('results');
 
   return (
@@ -107,6 +115,7 @@ const Results = ({ report, showExpanded }: ResultsProps) => {
         showExpanded={!!showExpanded}
         scoreText={t('score')}
       />
+      <LeadForm resultId={report.id} locale={locale} />
     </>
   );
 };

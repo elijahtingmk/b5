@@ -26,3 +26,16 @@ export const testId = z.object({
     .min(24)
     .max(24)
 });
+
+export const leadSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  email: z.string().trim().toLowerCase().email().max(200),
+  role: z.enum(['hr-osh', 'leader', 'individual']).optional(),
+  locale: z.string().max(16).optional(),
+  contactConsent: z.literal(true),
+  shareResult: z.boolean(),
+  resultId: z
+    .string()
+    .regex(/^[0-9a-f]{24}$/)
+    .optional()
+});

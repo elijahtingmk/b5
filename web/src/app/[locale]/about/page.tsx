@@ -3,6 +3,8 @@ import { title } from '@/components/primitives';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Feedback from './feedback';
 import { Link } from '@/navigation';
+import { practitioner } from '@/config/consent';
+import { siteConfig } from '@/config/site';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -34,33 +36,41 @@ export default async function AboutPage(props: Props) {
       <div className='text-center justify-center mt-10'>
         <h1 className={title()}>About</h1>
       </div>
-      <div className='mt-2 text-medium lg:mt-4 lg:text-large'>
+      <div className='mt-2 text-medium lg:mt-4 lg:text-large space-y-4'>
         <p>
-          Welcome to bigfive-test.com, your premier destination for exploring
-          personality traits using the scientifically acclaimed Big Five model.
-          Our free, open-source test offers detailed insights into the five key
-          dimensions of personality: Openness, Conscientiousness, Extraversion,
-          Agreeableness, and Neuroticism.
-        </p>
-        <br />
-        <p>
-          Each dimension is carefully analyzed to provide a comprehensive view
-          of your traits and how they influence your behavior and interactions.
+          This free Big Five personality test is offered by{' '}
+          <a href={practitioner.website} className='underline'>
+            {practitioner.name}
+          </a>
+          , a leadership, workplace resilience and psychosocial safety
+          practitioner based in {practitioner.location}.
         </p>
         <p>
-          Developed with precision and accessibility in mind, our test helps you
-          understand yourself better and foster personal growth. Embrace the
-          journey of self-discovery with bigfive-test.com, where psychological
-          insights meet user-friendly technology.
+          The test measures five broad dimensions of personality: Openness,
+          Conscientiousness, Extraversion, Agreeableness and Neuroticism, each
+          with six facets. It uses public-domain items from the International
+          Personality Item Pool (IPIP) and is built on the open-source{' '}
+          <a href={siteConfig.links.upstream} className='underline'>
+            bigfive-web
+          </a>{' '}
+          project.
         </p>
-        <br />
         <p>
-          If you have questions please read through the{' '}
+          It is a self-reflection tool. It is not a clinical or diagnostic
+          assessment, and it should not be used for hiring or employment
+          decisions. For leadership and career coaching, Elijah uses the
+          WorkPlace Big Five Profile®, a separate workplace-focused assessment.
+        </p>
+        <p>
+          Questions? Read the{' '}
           <Link href='/faq' className='underline'>
             FAQ
           </Link>{' '}
-          first. If you can&apos;t find an answer there, feel free to contact us
-          at bigfive-test@rubynor.com.
+          or email{' '}
+          <a href={`mailto:${practitioner.email}`} className='underline'>
+            {practitioner.email}
+          </a>
+          .
         </p>
       </div>
       <section>

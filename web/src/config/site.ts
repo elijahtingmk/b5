@@ -5,7 +5,7 @@ export type SiteConfig = typeof siteConfig;
 export const basePath =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://bigfive-test.com';
 
-export const supportEmail = 'bigfive-test@rubynor.com';
+export const supportEmail = 'elijah@drelijah.org';
 
 export type Language = {
   code: string;
@@ -56,7 +56,7 @@ export const locales = languages.map((lang) => lang.code) as string[];
 
 export const siteConfig = {
   name: 'Big Five Personality Test',
-  creator: '@maccyber',
+  creator: 'Elijah Ting, ED – L&D',
   description:
     'Learn to know yourself better with a free, open-source personality test.',
   navItems: [
@@ -134,10 +134,9 @@ export const siteConfig = {
     }
   ],
   links: {
-    github: 'https://github.com/rubynor/bigfive-web',
-    twitter: 'https://twitter.com/rubynor',
-    linkedIn: 'https://www.linkedin.com/company/rubynor-as/',
-    facebook: 'https://www.facebook.com/rubynorno'
+    practice: 'https://drelijah.org',
+    // This site is built on the open-source bigfive-web project (MIT).
+    upstream: 'https://github.com/rubynor/bigfive-web'
   }
 };
 

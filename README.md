@@ -4,9 +4,11 @@ Website for five factor model of personality based on work from [IPIP-NEO-PI](ht
 
 Tests and evaluation is gathered from [ipip.ori.org](http://ipip.ori.org).
 
-This copy is set up to run on **Cloudflare Workers**, with every submitted test
-result stored in a **Cloudflare D1** database so results can be opened again
-later by their ID. The original project runs at [bigfive-test.com](https://bigfive-test.com).
+This copy is run by [Elijah Ting, ED – L&D](https://drelijah.org). It runs on
+**Cloudflare Workers**, with every submitted test result stored in a
+**Cloudflare D1** database so results can be opened again later by their ID.
+Visitors can optionally leave their details on the results page to hear about
+coaching. The original project runs at [bigfive-test.com](https://bigfive-test.com).
 
 ## Hosting on Cloudflare
 
@@ -53,15 +55,46 @@ npx wrangler login
 pnpm run db:migrate:remote
 ```
 
-Results are kept until you delete them. To look at or export them, use the
-D1 console in the dashboard (**Storage & Databases → D1 → b5-results**) or:
+Results are kept until you delete them. To look at them, use the D1 console
+in the dashboard (**Storage & Databases → D1 → b5-results**).
+
+Tables:
+
+- `results`: one row per completed test, answers stored as JSON. No name or
+  contact details.
+- `leads`: people who chose to leave their details on the results page. Each
+  row stores the exact consent wording they agreed to and the notice version.
+  `result_id` is only filled in when they also agreed to let you view their
+  result.
+- `feedback`: the form on the About page.
+- `views`: article view counts.
+
+### Exporting to Excel
+
+From the `web` folder, after `npx wrangler login`:
 
 ```
-npx wrangler d1 execute b5-results --remote --command "SELECT id, lang, date_stamp FROM results ORDER BY date_stamp DESC LIMIT 20"
+pnpm run export:results   # results.csv: one row per test with the five trait scores (24-120)
+pnpm run export:leads     # leads.csv: name, email, role, consent wording, linked result
 ```
 
-Tables: `results` (one row per completed test, answers stored as JSON),
-`feedback` (the form on the About page) and `views` (article view counts).
+The CSV files contain personal data. They are git-ignored; keep them off shared
+drives and delete them when you are done.
+
+### Handling privacy requests
+
+The privacy notice (`/privacy`) promises that people can ask for their details
+to be deleted by emailing elijah@drelijah.org. To do that, run in the D1
+console:
+
+```sql
+DELETE FROM leads WHERE email = 'person@example.com';
+DELETE FROM results WHERE id = '<their result id>';
+```
+
+The notice also says contact details are kept for up to two years after the
+last contact. If you change the wording on the results page or the privacy
+page, update `NOTICE_VERSION` in `web/src/config/consent.ts`.
 
 ### Optional settings
 
@@ -69,7 +102,9 @@ Tables: `results` (one row per completed test, answers stored as JSON),
   `https://b5.example.workers.dev`), used in page metadata and the sitemap. Set
   it as a **build** variable. Share and copy-link buttons always use the
   address the visitor is on, so they work without it.
-- `NEXT_PUBLIC_ANALYTICS_ID`: a Google Analytics ID, if you want one.
+- `NEXT_PUBLIC_ANALYTICS_ID`: a Google Analytics ID, if you want one. The
+  privacy notice currently says the site uses no analytics cookies, so update
+  it before turning this on.
 
 ## Help wanted
 

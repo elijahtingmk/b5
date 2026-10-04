@@ -1,51 +1,52 @@
 'use client';
 import { title } from '@/components/primitives';
 import { Accordion, AccordionItem } from '@nextui-org/accordion';
+import { practitioner } from '@/config/consent';
 
 export default function FaqPage() {
   const faq = [
     {
-      question: 'I got an error on this website',
-      answer:
-        'Submit an issue at GitHub or send us an e-mail at bigfive-test@rubynor.com'
+      question: 'Who runs this site?',
+      answer: `${practitioner.name}, a leadership, workplace resilience and psychosocial safety practitioner in ${practitioner.location}. See ${practitioner.website}.`
     },
     {
-      question: 'Can I use the code for this website for Commercial Purposes?',
-      answer: 'Yes, this project is licensed under the MIT license.'
+      question: 'Is this a clinical or diagnostic test?',
+      answer:
+        'No. It is a self-reflection tool based on public-domain IPIP items. It does not diagnose anything and should not be used for hiring or employment decisions.'
     },
     {
-      question: 'Can I use the questions for Commercial Purposes?',
+      question: 'Will my employer see my results?',
       answer:
-        'Yes, the questions and translations are licensed under the MIT license.'
+        'No. Individual results are never shared with employers. Anyone who has your result ID or link can open your result page, so share it only with people you choose.'
+    },
+    {
+      question: 'Do I need to give my name or email?',
+      answer:
+        'No. The test and your results work without them. Leaving your details on the results page is optional and only used to contact you if you ask.'
+    },
+    {
+      question: 'How is this different from the WorkPlace Big Five Profile®?',
+      answer:
+        'This is a free snapshot using public-domain items. The WorkPlace Big Five Profile® is a separate workplace-focused assessment that Elijah uses in 1:1 leadership and career coaching.'
     },
     {
       question: 'How do I print my test results?',
       answer:
-        'Try to print the results-page from your browser or save it as a PDF-document and print that instead.'
+        'Use the PDF button on the results page, or print the page from your browser.'
     },
     {
-      question: 'I want to translate the questions to my language',
-      answer:
-        "Use this website to translate the questions. Select the language you want to translate from.Translate the questions and click 'generate'. This will generate a file and download it to your computer. Send the downloaded file to bigfive- test@rubynor.com and tell us which language you have translated. If you want to translate it directly on github instead, you can follow the description here."
-    },
-    {
-      question: 'I want to translate the result text to my language',
-      answer:
-        'If you want to translate the result text you need to follow the description here.'
+      question: 'How do I get my data deleted?',
+      answer: `Email ${practitioner.email}. To delete a test result, include its result ID.`
     },
     {
       question:
         'Where can I find more information about the questions and the evaluation?',
-      answer: 'See the IPIP Website for more information.'
-    },
-    {
-      question: 'Where can I find the questions?',
       answer:
-        'All questions and translations are in this repo in the data folder. The questions and scoring is taken from ipip.ori.org'
+        'The questions and scoring come from the International Personality Item Pool (ipip.ori.org).'
     },
     {
-      question: 'Where can I find the code?',
-      answer: 'The code is found here at GitHub.'
+      question: 'I found an error on this website',
+      answer: `Please email ${practitioner.email}.`
     }
   ];
   return (

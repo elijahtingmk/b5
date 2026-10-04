@@ -2,7 +2,12 @@
 
 import { getDb, newId } from '@/db';
 import { B5Error, DbResult, Feedback } from '@/types';
-import { testSchema } from '@/schemas';
+import { leadSchema, testSchema } from '@/schemas';
+import {
+  NOTICE_VERSION,
+  contactConsentText,
+  resultConsentText
+} from '@/config/consent';
 import { validId } from '@/lib/helpers';
 import calculateScore from '@bigfive-org/score';
 import generateResult, {
@@ -134,6 +139,70 @@ export async function saveFeedback(
     return {
       message: 'Error sending feedback!',
       type: 'error'
+    };
+  }
+}
+
+export type LeadState = {
+  status: 'idle' | 'success' | 'error';
+  message: string;
+};
+
+export async function saveLead(
+  prevState: LeadState,
+  formData: FormData
+): Promise<LeadState> {
+  'use server';
+  // Hidden field that people never see; bots that fill every input do.
+  if (formData.get('website')) {
+    return { status: 'success', message: 'Thank you.' };
+  }
+  const parsed = leadSchema.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    role: formData.get('role') || undefined,
+    locale: formData.get('locale') || undefined,
+    contactConsent: formData.get('contactConsent') === 'on',
+    shareResult: formData.get('shareResult') === 'on',
+    resultId: formData.get('resultId') || undefined
+  });
+  if (!parsed.success) {
+    return {
+      status: 'error',
+      message: 'Please enter your name and a valid email, and tick the box.'
+    };
+  }
+  const lead = parsed.data;
+  const shareResult = lead.shareResult && !!lead.resultId;
+  try {
+    const db = await getDb();
+    await db
+      .prepare(
+        `INSERT INTO leads (name, email, role, locale, contact_consent_text,
+           result_id, result_consent_text, notice_version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        lead.name,
+        lead.email,
+        lead.role ?? null,
+        lead.locale ?? null,
+        contactConsentText,
+        shareResult ? lead.resultId : null,
+        shareResult ? resultConsentText : null,
+        NOTICE_VERSION
+      )
+      .run();
+    return {
+      status: 'success',
+      message: 'Thank you. Elijah will be in touch by email.'
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 'error',
+      message:
+        'Sorry, that did not go through. Please email elijah@drelijah.org.'
     };
   }
 }
