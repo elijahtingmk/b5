@@ -81,6 +81,31 @@ pnpm run export:leads     # leads.csv: name, email, role, consent wording, linke
 The CSV files contain personal data. They are git-ignored; keep them off shared
 drives and delete them when you are done.
 
+### Telegram alerts for new enquiries
+
+When someone leaves their details on the results page or sends feedback, the
+site can message you on Telegram. The enquiry is always saved first, so a
+failed alert never loses it.
+
+1. In Telegram, open **@BotFather**, send `/newbot`, and follow the prompts.
+   It replies with a **token** like `123456789:AA...`. Treat it like a
+   password.
+2. Open a chat with your new bot and send it any message (bots can only message
+   people who have messaged them first).
+3. In a browser, open
+   `https://api.telegram.org/bot<your token>/getUpdates` and find
+   `"chat":{"id":123456789` in the reply. That number is your **chat ID**.
+4. In the Cloudflare dashboard, open **Workers & Pages → b5 → Settings →
+   Variables and Secrets**, click **Add**, choose type **Secret**, and add:
+   - `TELEGRAM_BOT_TOKEN` = the token from step 1
+   - `TELEGRAM_CHAT_ID` = the number from step 3
+5. Leave a test enquiry on the live site. The alert should arrive within a few
+   seconds. Delete the test row afterwards.
+
+Secrets survive future deploys. Without them the site works as before and
+simply sends no alerts. To test locally, put the same two lines in
+`web/.dev.vars` (git-ignored).
+
 ### Handling privacy requests
 
 The privacy notice (`/privacy`) promises that people can ask for their details
