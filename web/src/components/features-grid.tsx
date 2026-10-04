@@ -19,7 +19,7 @@ const styles = tv({
     header: 'gap-2 pb-0',
     body: '',
     iconWrapper:
-      'flex justify-center p-2 rounded-full items-center bg-secondary-100/80 text-pink-500',
+      'flex justify-center p-2 rounded-full items-center bg-brand-gold/15 text-brand-copper dark:text-brand-gold',
     title: 'text-base font-semibold',
     description: 'font-normal text-base text-default-500'
   }

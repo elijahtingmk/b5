@@ -1,3 +1,3 @@
 User-Agent: *
 Allow: /
-Sitemap: https://bigfive-test.com/sitemap.xml
+Sitemap: https://big5.drelijah.org/sitemap.xml
