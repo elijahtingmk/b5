@@ -2,16 +2,78 @@ const domainScore = (domain: string, name: string) =>
   `SUM(CASE WHEN json_extract(a.value, '$.domain') = '${domain}' ` +
   `THEN json_extract(a.value, '$.score') END) AS ${name}`;
 
-// Domain scores are plain sums of the stored (already reverse-keyed) answers,
-// the same way the site calculates them. Each ranges from 24 to 120.
-// Keep in step with scripts/export-csv.mjs.
+// The 30 facets (6 per domain) of the IPIP-NEO-120, named as in the site's
+// result report. Each facet is the sum of its 4 answers, from 4 to 20.
+const facets: [domain: string, names: string[]][] = [
+  [
+    'O',
+    [
+      'Imagination',
+      'Artistic Interests',
+      'Emotionality',
+      'Adventurousness',
+      'Intellect',
+      'Liberalism'
+    ]
+  ],
+  [
+    'C',
+    [
+      'Self-Efficacy',
+      'Orderliness',
+      'Dutifulness',
+      'Achievement-Striving',
+      'Self-Discipline',
+      'Cautiousness'
+    ]
+  ],
+  [
+    'E',
+    [
+      'Friendliness',
+      'Gregariousness',
+      'Assertiveness',
+      'Activity Level',
+      'Excitement-Seeking',
+      'Cheerfulness'
+    ]
+  ],
+  [
+    'A',
+    ['Trust', 'Morality', 'Altruism', 'Cooperation', 'Modesty', 'Sympathy']
+  ],
+  [
+    'N',
+    [
+      'Anxiety',
+      'Anger',
+      'Depression',
+      'Self-Consciousness',
+      'Immoderation',
+      'Vulnerability'
+    ]
+  ]
+];
+
+const facetColumns = facets
+  .flatMap(([domain, names]) =>
+    names.map(
+      (name, i) =>
+        `SUM(CASE WHEN json_extract(a.value, '$.domain') = '${domain}' ` +
+        `AND json_extract(a.value, '$.facet') = ${i + 1} ` +
+        `THEN json_extract(a.value, '$.score') END) AS "${domain}${i + 1} ${name}"`
+    )
+  )
+  .join(',\n      ');
+
 export const exportQueries = {
   results: `SELECT r.id, r.date_stamp, r.lang, r.time_elapsed AS seconds,
       ${domainScore('O', 'openness')},
       ${domainScore('C', 'conscientiousness')},
       ${domainScore('E', 'extraversion')},
       ${domainScore('A', 'agreeableness')},
-      ${domainScore('N', 'neuroticism')}
+      ${domainScore('N', 'neuroticism')},
+      ${facetColumns}
     FROM results r, json_each(r.answers) a
     GROUP BY r.id ORDER BY r.date_stamp DESC`,
   leads: `SELECT created_at, name, email, role, locale, result_id,

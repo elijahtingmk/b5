@@ -10,6 +10,68 @@ const domainScore = (domain, name) =>
   `SUM(CASE WHEN json_extract(a.value, '$.domain') = '${domain}' ` +
   `THEN json_extract(a.value, '$.score') END) AS ${name}`;
 
+// The 30 facets (6 per domain), each the sum of 4 answers (4-20).
+const facets = [
+  [
+    'O',
+    [
+      'Imagination',
+      'Artistic Interests',
+      'Emotionality',
+      'Adventurousness',
+      'Intellect',
+      'Liberalism'
+    ]
+  ],
+  [
+    'C',
+    [
+      'Self-Efficacy',
+      'Orderliness',
+      'Dutifulness',
+      'Achievement-Striving',
+      'Self-Discipline',
+      'Cautiousness'
+    ]
+  ],
+  [
+    'E',
+    [
+      'Friendliness',
+      'Gregariousness',
+      'Assertiveness',
+      'Activity Level',
+      'Excitement-Seeking',
+      'Cheerfulness'
+    ]
+  ],
+  [
+    'A',
+    ['Trust', 'Morality', 'Altruism', 'Cooperation', 'Modesty', 'Sympathy']
+  ],
+  [
+    'N',
+    [
+      'Anxiety',
+      'Anger',
+      'Depression',
+      'Self-Consciousness',
+      'Immoderation',
+      'Vulnerability'
+    ]
+  ]
+];
+const facetColumns = facets
+  .flatMap(([domain, names]) =>
+    names.map(
+      (name, i) =>
+        `SUM(CASE WHEN json_extract(a.value, '$.domain') = '${domain}' ` +
+        `AND json_extract(a.value, '$.facet') = ${i + 1} ` +
+        `THEN json_extract(a.value, '$.score') END) AS "${domain}${i + 1} ${name}"`
+    )
+  )
+  .join(',\n      ');
+
 // Domain scores are plain sums of the stored (already reverse-keyed) answers,
 // the same way the site calculates them. Each ranges from 24 to 120.
 // Keep in step with src/lib/exports.ts.
@@ -19,7 +81,8 @@ const queries = {
       ${domainScore('C', 'conscientiousness')},
       ${domainScore('E', 'extraversion')},
       ${domainScore('A', 'agreeableness')},
-      ${domainScore('N', 'neuroticism')}
+      ${domainScore('N', 'neuroticism')},
+      ${facetColumns}
     FROM results r, json_each(r.answers) a
     GROUP BY r.id ORDER BY r.date_stamp DESC`,
   leads: `SELECT l.created_at, l.name, l.email, l.role, l.locale, l.result_id,
