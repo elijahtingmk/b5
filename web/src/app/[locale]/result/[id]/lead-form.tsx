@@ -60,10 +60,11 @@ export const LeadForm = ({
         ) : (
           <p className='text-default-600'>
             This free snapshot uses public-domain IPIP Big Five items. In 1:1
-            leadership and career coaching, {practitioner.displayName} uses the
-            WorkPlace Big Five Profile®, a separate workplace-focused
-            assessment. Leave your details if you would like to hear more. This
-            is optional, and your results stay available either way.
+            leadership and career coaching, {practitioner.displayName} can build
+            on these results, or use the certified WorkPlace Big Five Profile®,
+            depending on what suits you. Leave your details if you would like to
+            hear more. This is optional, and your results stay available either
+            way.
           </p>
         )}
         {state.status === 'success' ? (

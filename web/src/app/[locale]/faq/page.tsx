@@ -27,7 +27,7 @@ export default function FaqPage() {
     {
       question: 'How is this different from the WorkPlace Big Five Profile®?',
       answer:
-        'This is a free snapshot using public-domain items. The WorkPlace Big Five Profile® is a separate workplace-focused assessment that Elijah uses in 1:1 leadership and career coaching.'
+        'This is a free snapshot using public-domain items. The WorkPlace Big Five Profile® is a separate, certified workplace-focused assessment. In 1:1 leadership and career coaching, Elijah uses either this free test or the WorkPlace Big Five Profile®, depending on what suits each client.'
     },
     {
       question: 'How do I print my test results?',
