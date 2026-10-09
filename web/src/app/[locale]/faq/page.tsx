@@ -27,7 +27,13 @@ export default function FaqPage() {
     {
       question: 'How is this different from the WorkPlace Big Five Profile®?',
       answer:
-        'This is a free snapshot using public-domain items. The WorkPlace Big Five Profile® is a separate workplace-focused assessment that Elijah uses in 1:1 leadership and career coaching.'
+        'This is a free snapshot using public-domain items. The WorkPlace Big Five Profile® is a separate workplace-focused assessment, and the one Elijah normally uses in 1:1 leadership and career coaching. For a lower-cost option, coaching can build on your results from this free test instead.'
+    },
+    {
+      question:
+        'How is the Career Interest Checklist different from Career Direct®?',
+      answer:
+        'The checklist is a free, 60-activity interest profile from the O*NET® Interest Profiler. Career Direct® is a separate career assessment that Elijah normally uses in 1:1 career coaching. For a lower-cost option, coaching can build on your checklist results instead.'
     },
     {
       question: 'How do I print my test results?',
