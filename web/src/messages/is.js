@@ -65,6 +65,7 @@ const icelandic = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Heim',
     result: 'Niðurstaða',
     compare: 'Berðu saman',

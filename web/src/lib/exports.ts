@@ -76,8 +76,14 @@ export const exportQueries = {
       ${facetColumns}
     FROM results r, json_each(r.answers) a
     GROUP BY r.id ORDER BY r.date_stamp DESC`,
-  leads: `SELECT created_at, name, email, role, locale, result_id,
-      notice_version, contact_consent_text, result_consent_text
+  riasec: `SELECT id, created_at, form_version, time_elapsed AS seconds,
+      realistic, investigative, artistic, social, enterprising, conventional,
+      -- As text Excel will not turn into a number: x = checked, . = not.
+      replace(replace(answers, '0', '.'), '1', 'x')
+        AS "activities (60, form order, x = checked)"
+    FROM riasec_results ORDER BY created_at DESC`,
+  leads: `SELECT created_at, name, email, role, locale, result_test,
+      result_id, notice_version, contact_consent_text, result_consent_text
     FROM leads ORDER BY created_at DESC`,
   feedback: `SELECT created_at, name, email, message
     FROM feedback ORDER BY created_at DESC`,
@@ -90,7 +96,8 @@ export type ExportTable = keyof typeof exportQueries;
 
 export const exportTables: { id: ExportTable; label: string }[] = [
   { id: 'enquiries', label: 'Scoping-call requests (drelijah.org)' },
-  { id: 'results', label: 'Test results (with trait scores)' },
+  { id: 'results', label: 'Big Five test results (with trait scores)' },
+  { id: 'riasec', label: 'Career interest results (RIASEC scores)' },
   { id: 'leads', label: 'Enquiries (people who left their details)' },
   { id: 'feedback', label: 'Feedback messages' }
 ];

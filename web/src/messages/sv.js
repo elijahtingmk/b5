@@ -65,6 +65,7 @@ innholdet er fra <i>Johnson's (2014) 120-item IPIP NEO-PI-R</i>.`,
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Hem',
     result: 'Resultater',
     compare: 'Jämförelse',

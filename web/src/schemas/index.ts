@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { answersPattern } from '@/config/riasec';
 
 export const testSchema = z.object({
   testId: z.string().max(32),
@@ -34,8 +35,17 @@ export const leadSchema = z.object({
   locale: z.string().max(16).optional(),
   contactConsent: z.literal(true),
   shareResult: z.boolean(),
+  resultTest: z.enum(['big5', 'riasec']).default('big5'),
   resultId: z
     .string()
     .regex(/^[0-9a-f]{24}$/)
     .optional()
+});
+
+export const riasecSchema = z.object({
+  answers: z.string().regex(answersPattern),
+  timeElapsed: z
+    .number()
+    .nonnegative()
+    .max(60 * 60 * 24)
 });

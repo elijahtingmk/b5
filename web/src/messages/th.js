@@ -65,6 +65,7 @@ const thai = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'หน้าหลัก',
     result: 'ผลลัพธ์',
     compare: 'การเปรียบเทียบ',

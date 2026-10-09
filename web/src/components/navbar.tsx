@@ -38,9 +38,10 @@ export const Navbar = ({ navItems, navMenuItems }: NavbarProps) => {
   const isCurrentPath = (link: string): boolean => {
     if (link === '/') {
       return pathname === '/' || pathname === `/${locale}`;
-    } else {
-      return pathname.includes(link);
     }
+    // Match whole leading segments, so /riasec/result/… is not "Result".
+    const path = pathname.replace(new RegExp(`^/${locale}(?=/|$)`), '');
+    return path === link || path.startsWith(`${link}/`);
   };
 
   return (

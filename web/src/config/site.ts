@@ -65,6 +65,10 @@ export const siteConfig = {
       href: '/'
     },
     {
+      label: 'career_interests',
+      href: '/riasec'
+    },
+    {
       label: 'result',
       href: '/result'
     },
@@ -85,6 +89,10 @@ export const siteConfig = {
     {
       label: 'home',
       href: '/'
+    },
+    {
+      label: 'career_interests',
+      href: '/riasec'
     },
     {
       label: 'see_results',
@@ -115,6 +123,10 @@ export const siteConfig = {
     {
       label: 'home',
       href: '/'
+    },
+    {
+      label: 'career_interests',
+      href: '/riasec'
     },
     {
       label: 'articles',

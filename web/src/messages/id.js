@@ -66,6 +66,7 @@ const indonesian = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Rumah',
     result: 'Hasil',
     compare: 'Bandingkan',

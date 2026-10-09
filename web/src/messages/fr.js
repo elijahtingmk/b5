@@ -66,6 +66,7 @@ const french = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Home',
     result: 'Résultat',
     compare: 'Comparer',

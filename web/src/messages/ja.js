@@ -65,6 +65,7 @@ const japanese = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'ホーム',
     result: '結果',
     compare: '比較する',

@@ -64,6 +64,7 @@ const hindi = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Home',
     result: 'परिणाम',
     compare: 'तुलना',

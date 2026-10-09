@@ -62,6 +62,7 @@ const chinese = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: '首頁',
     result: '结果',
     compare: '比较',

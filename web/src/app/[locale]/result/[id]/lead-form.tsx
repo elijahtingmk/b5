@@ -18,9 +18,17 @@ import {
 interface LeadFormProps {
   resultId: string;
   locale: string;
+  test?: 'big5' | 'riasec';
 }
 
-export const LeadForm = ({ resultId, locale }: LeadFormProps) => {
+// localStorage key each test uses for the result taken in this browser.
+const ownedResultKey = { big5: 'resultId', riasec: 'riasecResultId' };
+
+export const LeadForm = ({
+  resultId,
+  locale,
+  test = 'big5'
+}: LeadFormProps) => {
   const [state, formAction, pending] = useActionState<LeadState, FormData>(
     saveLead,
     { status: 'idle', message: '' }
@@ -31,9 +39,9 @@ export const LeadForm = ({ resultId, locale }: LeadFormProps) => {
   const [ownsResult, setOwnsResult] = useState(false);
   useEffect(() => {
     try {
-      setOwnsResult(localStorage.getItem('resultId') === resultId);
+      setOwnsResult(localStorage.getItem(ownedResultKey[test]) === resultId);
     } catch {}
-  }, [resultId]);
+  }, [resultId, test]);
 
   return (
     <Card className='mt-16 print:hidden' shadow='sm'>
@@ -41,13 +49,23 @@ export const LeadForm = ({ resultId, locale }: LeadFormProps) => {
         <h2 className='text-2xl font-semibold'>
           Want to talk through your profile?
         </h2>
-        <p className='text-default-600'>
-          This free snapshot uses public-domain IPIP Big Five items. In 1:1
-          leadership and career coaching, {practitioner.name} uses the WorkPlace
-          Big Five Profile®, a separate workplace-focused assessment. Leave
-          your details if you would like to hear more. This is optional, and
-          your results stay available either way.
-        </p>
+        {test === 'riasec' ? (
+          <p className='text-default-600'>
+            Interest areas are a starting point, not a verdict. In 1:1 career
+            coaching, {practitioner.name} helps you weigh your interests against
+            your strengths, values and the options open to you. Leave your
+            details if you would like to hear more. This is optional, and your
+            results stay available either way.
+          </p>
+        ) : (
+          <p className='text-default-600'>
+            This free snapshot uses public-domain IPIP Big Five items. In 1:1
+            leadership and career coaching, {practitioner.name} uses the
+            WorkPlace Big Five Profile®, a separate workplace-focused
+            assessment. Leave your details if you would like to hear more. This
+            is optional, and your results stay available either way.
+          </p>
+        )}
         {state.status === 'success' ? (
           <p className='font-medium text-success-600' role='status'>
             {state.message}
@@ -56,6 +74,7 @@ export const LeadForm = ({ resultId, locale }: LeadFormProps) => {
           <form action={formAction} className='flex flex-col gap-4'>
             <input type='hidden' name='locale' value={locale} />
             <input type='hidden' name='resultId' value={resultId} />
+            <input type='hidden' name='resultTest' value={test} />
             <input
               type='text'
               name='website'
