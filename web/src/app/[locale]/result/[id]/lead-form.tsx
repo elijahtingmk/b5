@@ -52,15 +52,15 @@ export const LeadForm = ({
         {test === 'riasec' ? (
           <p className='text-default-600'>
             Interest areas are a starting point, not a verdict. In 1:1 career
-            coaching, {practitioner.name} helps you weigh your interests against
-            your strengths, values and the options open to you. Leave your
-            details if you would like to hear more. This is optional, and your
-            results stay available either way.
+            coaching, {practitioner.displayName} helps you weigh your interests
+            against your strengths, values and the options open to you. Leave
+            your details if you would like to hear more. This is optional, and
+            your results stay available either way.
           </p>
         ) : (
           <p className='text-default-600'>
             This free snapshot uses public-domain IPIP Big Five items. In 1:1
-            leadership and career coaching, {practitioner.name} uses the
+            leadership and career coaching, {practitioner.displayName} uses the
             WorkPlace Big Five Profile®, a separate workplace-focused
             assessment. Leave your details if you would like to hear more. This
             is optional, and your results stay available either way.

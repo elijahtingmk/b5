@@ -20,7 +20,7 @@ export async function generateMetadata(props: {
   const t = await getTranslations({ locale, namespace: 'toolbar' });
   return {
     title: t('about'),
-    description: `A free Big Five personality snapshot offered by ${practitioner.name}, ${practitioner.location}.`
+    description: `A free Big Five personality snapshot and career interest checklist offered by ${practitioner.displayName}, ${practitioner.location}.`
   };
 }
 
@@ -38,15 +38,19 @@ export default async function AboutPage(props: Props) {
       </div>
       <div className='mt-2 text-medium lg:mt-4 lg:text-large space-y-4'>
         <p>
-          This free Big Five personality test is offered by{' '}
+          These free tools are offered by{' '}
           <a href={practitioner.website} className='underline'>
-            {practitioner.name}
+            {practitioner.displayName}
           </a>
           , a leadership, workplace resilience and psychosocial safety
           practitioner based in {practitioner.location}.
         </p>
         <p>
-          The test measures five broad dimensions of personality: Openness,
+          The{' '}
+          <Link href='/test' className='underline'>
+            Big Five personality test
+          </Link>{' '}
+          measures five broad dimensions of personality: Openness,
           Conscientiousness, Extraversion, Agreeableness and Neuroticism, each
           with six facets. It uses public-domain items from the International
           Personality Item Pool (IPIP) and is built on the open-source{' '}
@@ -56,10 +60,30 @@ export default async function AboutPage(props: Props) {
           project.
         </p>
         <p>
-          It is a self-reflection tool. It is not a clinical or diagnostic
-          assessment, and it should not be used for hiring or employment
-          decisions. For leadership and career coaching, Elijah uses the
-          WorkPlace Big Five Profile®, a separate workplace-focused assessment.
+          The{' '}
+          <Link href='/riasec' className='underline'>
+            Career Interest Checklist
+          </Link>{' '}
+          shows your three strongest of the six Holland Code (RIASEC) interest
+          areas: Realistic, Investigative, Artistic, Social, Enterprising and
+          Conventional. It is the O*NET® Interest Profiler Short Form,
+          reproduced word for word from the version developed by the National
+          Center for O*NET Development for the U.S. Department of Labor, and
+          used under the{' '}
+          <a
+            href='https://creativecommons.org/licenses/by-nd/4.0/'
+            className='underline'
+          >
+            CC BY-ND 4.0
+          </a>{' '}
+          license.
+        </p>
+        <p>
+          Both are self-reflection tools. They are not clinical or diagnostic
+          assessments, and they should not be used for hiring or employment
+          decisions. For leadership and career coaching, Elijah uses separate
+          certified assessments: the WorkPlace Big Five Profile® and Career
+          Direct®.
         </p>
         <p>
           Questions? Read the{' '}

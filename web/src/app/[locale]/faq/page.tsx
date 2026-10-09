@@ -7,7 +7,7 @@ export default function FaqPage() {
   const faq = [
     {
       question: 'Who runs this site?',
-      answer: `${practitioner.name}, a leadership, workplace resilience and psychosocial safety practitioner in ${practitioner.location}. See ${practitioner.website}.`
+      answer: `${practitioner.displayName}, a leadership, workplace resilience and psychosocial safety practitioner in ${practitioner.location}. See ${practitioner.website}.`
     },
     {
       question: 'Is this a clinical or diagnostic test?',
