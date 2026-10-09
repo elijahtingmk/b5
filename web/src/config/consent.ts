@@ -5,6 +5,10 @@ export const NOTICE_VERSION = '2026-10-09.1';
 
 export const practitioner = {
   name: 'Elijah Ting, ED – L&D',
+  // Where a sentence introduces Elijah as a person (as on drelijah.org's
+  // Earned Leadership page). Branding, the footer, the privacy notice and the
+  // stored consent wording keep the plain name above.
+  displayName: 'Dr. Elijah Ting, ED – L&D',
   legalName: 'Ting Moi Kieng',
   email: 'elijah@drelijah.org',
   website: 'https://drelijah.org',
