@@ -175,6 +175,7 @@ export async function saveLead(
     locale: formData.get('locale') || undefined,
     contactConsent: formData.get('contactConsent') === 'on',
     shareResult: formData.get('shareResult') === 'on',
+    resultTest: formData.get('resultTest') || undefined,
     resultId: formData.get('resultId') || undefined
   });
   if (!parsed.success) {
@@ -190,8 +191,8 @@ export async function saveLead(
     await db
       .prepare(
         `INSERT INTO leads (name, email, role, locale, contact_consent_text,
-           result_id, result_consent_text, notice_version)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+           result_id, result_test, result_consent_text, notice_version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         lead.name,
@@ -200,15 +201,18 @@ export async function saveLead(
         lead.locale ?? null,
         contactConsentText,
         shareResult ? lead.resultId : null,
+        shareResult ? lead.resultTest : null,
         shareResult ? resultConsentText : null,
         NOTICE_VERSION
       )
       .run();
     const roleLabel =
       leadRoles.find((role) => role.id === lead.role)?.label ?? 'Not given';
+    const testLabel =
+      lead.resultTest === 'riasec' ? 'Career interests' : 'Big Five';
     await notifyOwner(
       [
-        'New enquiry on big5.drelijah.org',
+        `New enquiry on big5.drelijah.org (${testLabel})`,
         `Name: ${lead.name}`,
         `Email: ${lead.email}`,
         `Role: ${roleLabel}`,

@@ -80,6 +80,22 @@ for drelijah.org, set its secret as the Worker secret `TURNSTILE_SECRET`, and pu
 its site key in the form's `data-turnstile-sitekey` on drelijah.org. Requests
 appear on the admin page and via `pnpm run export:enquiries`.
 
+### Career interest checklist (RIASEC)
+
+`/riasec` is a 60-activity Holland Code checklist: the O*NET® Interest Profiler
+Short Form, reproduced word for word from the paper version published by the
+National Center for O*NET Development. Results are kept in the
+`riasec_results` table and appear on the download page.
+
+It is used under [CC BY-ND 4.0](https://www.onetcenter.org/license_tools.html),
+which allows commercial use but **no modified versions**. Keep the activities,
+instructions and descriptions in [`web/src/config/riasec.ts`](web/src/config/riasec.ts)
+exactly as published, and keep the credit at the bottom of the checklist and
+results pages. A translation (for example into Bahasa Malaysia) or any reworded
+version would need the O*NET Tools Developer License instead, which requires
+the modified tool to be validated and a statement that USDOL/ETA has not
+approved it.
+
 ### Private download page
 
 `https://big5.drelijah.org/admin` shows how many results, enquiries and
@@ -107,6 +123,7 @@ From the `web` folder, after `npx wrangler login`:
 
 ```
 pnpm run export:results   # results.csv: one row per test with the five trait scores (24-120)
+pnpm run export:riasec    # riasec.csv: one row per career interest checklist, six scores (0-10)
 pnpm run export:leads     # leads.csv: name, email, role, consent wording, linked result
 pnpm run export:feedback  # feedback.csv
 ```

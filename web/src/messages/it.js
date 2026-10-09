@@ -65,6 +65,7 @@ l'inventario proviene da <i>Johnson's (2014) IPIP NEO-PI-R di 120 elementi</i>.`
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Home',
     result: 'Risultato',
     compare: 'Comparare',

@@ -47,9 +47,12 @@ export default function PrivacyPage() {
 
         <Section heading='What we collect'>
           <p>
-            <strong>When you take the test</strong> we store your answers, the
-            test language, the date, and how long you took. We do not ask for
-            your name, and the result is identified only by a random ID.
+            <strong>When you take a test</strong> (the Big Five personality test
+            or the career interest checklist) we store your answers, the date,
+            how long you took and, for the Big Five test, its language. For the
+            checklist, your answers are which activities you checked. We do not
+            ask for your name, and each result is identified only by a random
+            ID.
           </p>
           <p>
             <strong>Only if you choose to leave your details</strong> on the
@@ -87,7 +90,7 @@ export default function PrivacyPage() {
             </li>
           </ul>
           <p>
-            This test is not a clinical or diagnostic tool, and it is not
+            These tests are not clinical or diagnostic tools, and they are not
             intended for hiring or employment decisions.
           </p>
         </Section>
@@ -143,10 +146,12 @@ export default function PrivacyPage() {
 
         <Section heading='Data yang kami kumpul'>
           <p>
-            <strong>Apabila anda mengambil ujian</strong>, kami menyimpan
-            jawapan anda, bahasa ujian, tarikh, dan tempoh masa yang diambil.
-            Kami tidak meminta nama anda, dan keputusan hanya dikenal pasti
-            melalui ID rawak.
+            <strong>Apabila anda mengambil ujian</strong> (ujian personaliti Big
+            Five atau senarai semak minat kerjaya), kami menyimpan jawapan anda,
+            tarikh, tempoh masa yang diambil dan, bagi ujian Big Five,
+            bahasanya. Bagi senarai semak, jawapan anda ialah aktiviti yang anda
+            tandakan. Kami tidak meminta nama anda, dan setiap keputusan hanya
+            dikenal pasti melalui ID rawak.
           </p>
           <p>
             <strong>Hanya jika anda memilih untuk meninggalkan butiran</strong>{' '}
@@ -186,8 +191,8 @@ export default function PrivacyPage() {
             </li>
           </ul>
           <p>
-            Ujian ini bukan alat klinikal atau diagnostik, dan tidak bertujuan
-            untuk keputusan pengambilan atau pekerjaan.
+            Ujian-ujian ini bukan alat klinikal atau diagnostik, dan tidak
+            bertujuan untuk keputusan pengambilan atau pekerjaan.
           </p>
         </Section>
 

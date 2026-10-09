@@ -22,6 +22,7 @@ import { Button } from '@nextui-org/button';
 import { setRequestLocale } from 'next-intl/server';
 import { Chip, Tooltip } from '@nextui-org/react';
 import NextLink from 'next/link';
+import { Link as LocaleLink } from '@/navigation';
 import { Translated } from '@/components/translated';
 
 interface Props {
@@ -116,6 +117,13 @@ export default function Home(props: Props) {
                 Coaching with Elijah Ting
               </Link>
             </div>
+            <p className='text-center text-default-600'>
+              Choosing a career direction? Try the{' '}
+              <LocaleLink href='/riasec' className='underline'>
+                Career Interest Checklist (RIASEC)
+              </LocaleLink>
+              .
+            </p>
           </div>
 
           <div className='font-normal text-default-500 block max-w-full text-center underline'>

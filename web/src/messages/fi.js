@@ -65,6 +65,7 @@ const finnish = {
     }
   },
   toolbar: {
+    career_interests: 'Career interests',
     home: 'Koti',
     result: 'Tulos',
     compare: 'Vertailla',

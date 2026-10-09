@@ -1,6 +1,7 @@
 // Export results or leads from D1 to a CSV file that opens in Excel.
 //
 //   pnpm run export:results            -> results.csv (live database)
+//   pnpm run export:riasec             -> riasec.csv  (live database)
 //   pnpm run export:leads              -> leads.csv   (live database)
 //   add -- --local to read the local development database instead
 import { execFileSync } from 'node:child_process';
@@ -85,8 +86,14 @@ const queries = {
       ${facetColumns}
     FROM results r, json_each(r.answers) a
     GROUP BY r.id ORDER BY r.date_stamp DESC`,
-  leads: `SELECT l.created_at, l.name, l.email, l.role, l.locale, l.result_id,
-      l.notice_version, l.contact_consent_text, l.result_consent_text
+  riasec: `SELECT id, created_at, form_version, time_elapsed AS seconds,
+      realistic, investigative, artistic, social, enterprising, conventional,
+      -- As text Excel will not turn into a number: x = checked, . = not.
+      replace(replace(answers, '0', '.'), '1', 'x')
+        AS "activities (60, form order, x = checked)"
+    FROM riasec_results ORDER BY created_at DESC`,
+  leads: `SELECT l.created_at, l.name, l.email, l.role, l.locale,
+      l.result_test, l.result_id, l.notice_version, l.contact_consent_text, l.result_consent_text
     FROM leads l ORDER BY l.created_at DESC`,
   feedback: `SELECT created_at, name, email, message
     FROM feedback ORDER BY created_at DESC`,

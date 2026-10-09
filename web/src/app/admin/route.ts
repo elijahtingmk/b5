@@ -14,6 +14,7 @@ export async function GET(request: Request) {
   const counts = await db
     .prepare(
       `SELECT (SELECT count(*) FROM results) AS results,
+              (SELECT count(*) FROM riasec_results) AS riasec,
               (SELECT count(*) FROM leads) AS leads,
               (SELECT count(*) FROM feedback) AS feedback,
               (SELECT count(*) FROM enquiries) AS enquiries`

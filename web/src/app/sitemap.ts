@@ -38,6 +38,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // add lang
     },
     {
+      url: `${basePath}/riasec`,
+      lastModified: new Date()
+    },
+    {
       url: `${basePath}/about`,
       lastModified: new Date()
     },
