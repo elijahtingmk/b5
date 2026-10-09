@@ -81,9 +81,10 @@ export default async function AboutPage(props: Props) {
         <p>
           Both are self-reflection tools. They are not clinical or diagnostic
           assessments, and they should not be used for hiring or employment
-          decisions. In leadership and career coaching, Elijah uses either these
-          free tools or certified assessments (the WorkPlace Big Five Profile®
-          and Career Direct®), depending on what suits each client.
+          decisions. In leadership and career coaching, Elijah normally uses
+          certified assessments: the WorkPlace Big Five Profile® and Career
+          Direct®. For a lower-cost option, coaching can build on your results
+          from these free tools instead.
         </p>
         <p>
           Questions? Read the{' '}
