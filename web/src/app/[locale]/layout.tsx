@@ -55,7 +55,7 @@ export async function generateMetadata(props: {
       description: t('seo.description'),
       images: {
         url: `${basePath}/og-image.png`,
-        alt: 'Big Five Snapshot by Elijah Ting, drelijah.org'
+        alt: 'Big Five Snapshot by Dr. Elijah Ting, drelijah.org'
       }
     },
     twitter: {
@@ -66,7 +66,7 @@ export async function generateMetadata(props: {
       creator: siteConfig.creator,
       images: {
         url: `${basePath}/og-image.png`,
-        alt: 'Big Five Snapshot by Elijah Ting, drelijah.org'
+        alt: 'Big Five Snapshot by Dr. Elijah Ting, drelijah.org'
       }
     }
   };
