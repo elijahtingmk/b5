@@ -9,7 +9,7 @@ import {
   resultConsentText
 } from '@/config/consent';
 import { validId } from '@/lib/helpers';
-import { notifyOwner } from '@/lib/notify';
+import { notifyOwner, sendOwnerEmail } from '@/lib/notify';
 import { leadRoles } from '@/config/consent';
 import calculateScore from '@bigfive-org/score';
 import generateResult, {
@@ -219,6 +219,41 @@ export async function saveLead(
         `Result shared: ${shareResult ? `yes (${lead.resultId})` : 'no'}`
       ].join('\n')
     );
+
+    const submittedAt = new Date().toLocaleString('en-GB', {
+      timeZone: 'Asia/Kuala_Lumpur',
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+    const strip = (s: string) => s.replace(/[\r\n]+/g, ' ').trim();
+    const subjectPrefix =
+      lead.resultTest === 'riasec'
+        ? 'New Career Interests enquiry'
+        : 'New Big Five enquiry';
+    const subject = strip(`${subjectPrefix}: ${lead.name}`).slice(0, 200);
+    const resultUrl = shareResult
+      ? `https://big5.drelijah.org/${lead.resultTest === 'riasec' ? 'riasec' : lead.locale || 'en'}/result/${lead.resultId}`
+      : undefined;
+    const bodyLines = [
+      `Name: ${lead.name}`,
+      `Email: ${lead.email}`,
+      `Role: ${roleLabel}`,
+      `Result shared: ${shareResult ? 'yes' : 'no'}`,
+      shareResult && `Result ID: ${lead.resultId}`,
+      resultUrl && `Result: ${resultUrl}`,
+      `Language: ${lead.locale || 'not recorded'}`,
+      `Submitted: ${submittedAt}`,
+      '',
+      'Admin: https://big5.drelijah.org/admin'
+    ]
+      .filter(Boolean)
+      .join('\n');
+    await sendOwnerEmail({
+      subject,
+      body: bodyLines,
+      replyTo: lead.email
+    });
+
     return {
       status: 'success',
       message: 'Thank you. Elijah will be in touch by email.'
