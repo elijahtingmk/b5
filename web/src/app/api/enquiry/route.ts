@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
-import { notifyOwner } from '@/lib/notify';
+import { notifyOwner, sendEnquiryEmail } from '@/lib/notify';
 import {
   MAIN_SITE_NOTICE_VERSION,
   allowedOrigins,
@@ -141,6 +141,28 @@ export async function POST(request: Request) {
     console.error(error);
     return back(origin, 'error=server');
   }
+
+  const submittedAt = new Date().toLocaleString('en-GB', {
+    timeZone: 'Asia/Kuala_Lumpur',
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+
+  await sendEnquiryEmail({
+    name: e.name,
+    email: e.email,
+    organisation: e.organisation,
+    need: e.need,
+    needLabel: needs[e.need],
+    size: e.size,
+    sizeLabel: e.size ? sizes[e.size] : undefined,
+    hrd: e.hrd,
+    hrdLabel: e.hrd ? hrdCorp[e.hrd] : undefined,
+    phone: e.phone,
+    message: e.message,
+    sourcePage,
+    submittedAt
+  });
 
   await notifyOwner(
     [

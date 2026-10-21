@@ -28,4 +28,10 @@
   "observability": {
     "enabled": true
   }
+  // Environment variables (set via `wrangler secret put <NAME>`):
+  // - TELEGRAM_BOT_TOKEN: Telegram bot token for notifications
+  // - TELEGRAM_CHAT_ID: Telegram chat ID for notifications
+  // - TURNSTILE_SECRET: Cloudflare Turnstile secret key
+  // - ENQUIRY_EMAIL_RELAY_URL: Google Apps Script web app URL for email relay (ends in /exec)
+  // - ENQUIRY_EMAIL_RELAY_TOKEN: Authentication token for email relay
 }
