@@ -51,29 +51,15 @@ export async function notifyOwner(text: string): Promise<void> {
   }
 }
 
-export type EnquiryEmailData = {
-  name: string;
-  email: string;
-  organisation?: string;
-  need: string;
-  needLabel: string;
-  size?: string;
-  sizeLabel?: string;
-  hrd?: string;
-  hrdLabel?: string;
-  phone?: string;
-  message?: string;
-  sourcePage?: string;
-  submittedAt: string;
-};
-
 // Sends an email via Google Apps Script relay if ENQUIRY_EMAIL_RELAY_URL and
 // ENQUIRY_EMAIL_RELAY_TOKEN are set as Worker secrets; otherwise does nothing.
 // Never throws: the submission is already saved, and a failed alert must not
 // turn into an error for the visitor.
-export async function sendEnquiryEmail(
-  data: EnquiryEmailData
-): Promise<void> {
+export async function sendOwnerEmail(params: {
+  subject: string;
+  body: string;
+  replyTo?: string;
+}): Promise<void> {
   try {
     const { env, ctx } = await getCloudflareContext({ async: true });
     const {
@@ -84,38 +70,14 @@ export async function sendEnquiryEmail(
 
     const send = (async () => {
       try {
-        const strip = (s: string) => s.replace(/[\r\n]+/g, ' ').trim();
-        const orgOrName = data.organisation?.trim() || data.name;
-        const subjectPrefix =
-          data.need === 'prisma' ? 'New PRisMA enquiry' : 'New enquiry';
-        const subject = strip(`${subjectPrefix}: ${orgOrName}`).slice(0, 200);
-
-        const bodyLines = [
-          `Name: ${data.name}`,
-          `Email: ${data.email}`,
-          data.phone && `Phone: ${data.phone}`,
-          data.organisation && `Organisation: ${data.organisation}`,
-          `Need: ${data.needLabel}`,
-          data.sizeLabel && `Size: ${data.sizeLabel}`,
-          data.hrdLabel && `HRD Corp claimable: ${data.hrdLabel}`,
-          data.sourcePage && `From page: ${data.sourcePage}`,
-          `Submitted: ${data.submittedAt}`,
-          '',
-          data.message && data.message,
-          '',
-          'Admin: https://big5.drelijah.org/admin'
-        ]
-          .filter(Boolean)
-          .join('\n');
-
         const response = await fetch(relayUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             token: relayToken,
-            subject,
-            body: bodyLines,
-            replyTo: data.email
+            subject: params.subject,
+            body: params.body,
+            replyTo: params.replyTo
           }),
           redirect: 'follow'
         });
@@ -144,4 +106,58 @@ export async function sendEnquiryEmail(
   } catch (error) {
     console.error('Email notification failed', error);
   }
+}
+
+export type EnquiryEmailData = {
+  name: string;
+  email: string;
+  organisation?: string;
+  need: string;
+  needLabel: string;
+  size?: string;
+  sizeLabel?: string;
+  hrd?: string;
+  hrdLabel?: string;
+  phone?: string;
+  message?: string;
+  sourcePage?: string;
+  submittedAt: string;
+};
+
+// Sends an email via Google Apps Script relay if ENQUIRY_EMAIL_RELAY_URL and
+// ENQUIRY_EMAIL_RELAY_TOKEN are set as Worker secrets; otherwise does nothing.
+// Never throws: the submission is already saved, and a failed alert must not
+// turn into an error for the visitor.
+export async function sendEnquiryEmail(
+  data: EnquiryEmailData
+): Promise<void> {
+  const strip = (s: string) => s.replace(/[\r\n]+/g, ' ').trim();
+  const orgOrName = data.organisation?.trim() || data.name;
+  const subjectPrefix =
+    data.need === 'prisma' ? 'New PRisMA enquiry' : 'New enquiry';
+  const subject = strip(`${subjectPrefix}: ${orgOrName}`).slice(0, 200);
+
+  const bodyLines = [
+    `Name: ${data.name}`,
+    `Email: ${data.email}`,
+    data.phone && `Phone: ${data.phone}`,
+    data.organisation && `Organisation: ${data.organisation}`,
+    `Need: ${data.needLabel}`,
+    data.sizeLabel && `Size: ${data.sizeLabel}`,
+    data.hrdLabel && `HRD Corp claimable: ${data.hrdLabel}`,
+    data.sourcePage && `From page: ${data.sourcePage}`,
+    `Submitted: ${data.submittedAt}`,
+    '',
+    data.message && data.message,
+    '',
+    'Admin: https://big5.drelijah.org/admin'
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  await sendOwnerEmail({
+    subject,
+    body: bodyLines,
+    replyTo: data.email
+  });
 }
