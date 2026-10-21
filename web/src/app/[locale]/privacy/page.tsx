@@ -110,6 +110,12 @@ export default function PrivacyPage() {
             scores are not included in these notifications.
           </p>
           <p>
+            When you send an enquiry, your details are emailed to me and copied
+            to a secure assistant inbox I use to make sure no enquiry is missed.
+            They are used only to respond to you and are never sold or shared
+            for marketing.
+          </p>
+          <p>
             Anyone who has your result ID or link can open your result page, so
             share it only with people you choose.
           </p>
@@ -211,6 +217,12 @@ export default function PrivacyPage() {
             Elijah melalui Telegram sebagai pemberitahuan. Telegram mungkin
             memprosesnya di luar Malaysia. Skor ujian tidak disertakan dalam
             pemberitahuan ini.
+          </p>
+          <p lang='en'>
+            When you send an enquiry, your details are emailed to me and copied
+            to a secure assistant inbox I use to make sure no enquiry is missed.
+            They are used only to respond to you and are never sold or shared
+            for marketing.
           </p>
           <p>
             Sesiapa yang mempunyai ID atau pautan keputusan anda boleh membuka
