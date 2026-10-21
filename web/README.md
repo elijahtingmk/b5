@@ -46,6 +46,18 @@ To try the production build in the real Workers runtime:
 pnpm run preview
 ```
 
+## Environment Variables
+
+The following secrets must be set using `wrangler secret put <NAME>`:
+
+- `ENQUIRY_EMAIL_RELAY_URL` — Google Apps Script web app URL for email relay (ends in `/exec`)
+- `ENQUIRY_EMAIL_RELAY_TOKEN` — Authentication token for email relay
+
+Optional secrets for additional features:
+
+- `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` — For Telegram notifications
+- `TURNSTILE_SECRET` — For Cloudflare Turnstile CAPTCHA verification
+
 ## Deployment
 
 See the [main README](../README.md#hosting-on-cloudflare).
