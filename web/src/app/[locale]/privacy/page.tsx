@@ -110,10 +110,10 @@ export default function PrivacyPage() {
             scores are not included in these notifications.
           </p>
           <p>
-            When you send an enquiry, your details are emailed to me and copied
-            to a secure assistant inbox I use to make sure no enquiry is missed.
-            They are used only to respond to you and are never sold or shared
-            for marketing.
+            When you send an enquiry, your details are also emailed to Elijah
+            and copied to a secure assistant inbox he uses to make sure no
+            enquiry is missed. They are used only to respond to you and are
+            never sold or shared for marketing.
           </p>
           <p>
             Anyone who has your result ID or link can open your result page, so
@@ -218,11 +218,12 @@ export default function PrivacyPage() {
             memprosesnya di luar Malaysia. Skor ujian tidak disertakan dalam
             pemberitahuan ini.
           </p>
-          <p lang='en'>
-            When you send an enquiry, your details are emailed to me and copied
-            to a secure assistant inbox I use to make sure no enquiry is missed.
-            They are used only to respond to you and are never sold or shared
-            for marketing.
+          <p>
+            Apabila anda menghantar pertanyaan, butiran anda juga dihantar
+            melalui e-mel kepada Elijah dan disalin ke peti masuk pembantu yang
+            selamat yang digunakannya untuk memastikan tiada pertanyaan terlepas.
+            Butiran ini hanya digunakan untuk membalas anda dan tidak akan
+            dijual atau dikongsi untuk tujuan pemasaran.
           </p>
           <p>
             Sesiapa yang mempunyai ID atau pautan keputusan anda boleh membuka
