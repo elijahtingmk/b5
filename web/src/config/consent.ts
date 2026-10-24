@@ -6,7 +6,7 @@ export const NOTICE_VERSION = '2026-10-09.1';
 export const practitioner = {
   name: 'Elijah Ting, ED – L&D',
   // Public name wherever a sentence introduces Elijah. Keep this identical
-  // to `name`. Never "Dr. Elijah Ting".
+  // to `name`. Do not add a doctoral title.
   displayName: 'Elijah Ting, ED – L&D',
   legalName: 'Ting Moi Kieng',
   email: 'elijah@drelijah.org',
