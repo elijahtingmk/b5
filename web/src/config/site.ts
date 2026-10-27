@@ -56,7 +56,7 @@ export const locales = languages.map((lang) => lang.code) as string[];
 
 export const siteConfig = {
   name: 'Big Five Snapshot · drelijah.org',
-  creator: 'Elijah Ting, ED – L&D',
+  creator: 'Dr Elijah Ting, ED – L&D',
   description:
     'Learn to know yourself better with a free, open-source personality test.',
   navItems: [

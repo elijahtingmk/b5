@@ -114,7 +114,7 @@ export default function Home(props: Props) {
                 )}
                 href={siteConfig.links.practice}
               >
-                Coaching with Elijah Ting, ED – L&D
+                Coaching with Dr Elijah Ting
               </Link>
             </div>
             <p className='text-center text-default-600'>

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Big Five Snapshot · drelijah.org',
     short_name: 'Big Five',
     description:
-      'A free Big Five personality snapshot and career interest checklist from Elijah Ting, ED – L&D (drelijah.org).',
+      'A free Big Five personality snapshot and career interest checklist from Dr Elijah Ting, ED – L&D (drelijah.org).',
     start_url: '/',
     display: 'standalone',
     background_color: '#fbf8f3',
