@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { Report, getTestResult } from '@/actions';
 import { Snippet } from '@nextui-org/snippet';
 import { useTranslations } from 'next-intl';
@@ -42,6 +43,8 @@ export default async function ResultPage(props: ResultPageParams) {
   try {
     report = await getTestResult(params.id.substring(0, 24), searchParams.lang);
   } catch (error) {
+    // Unknown or malformed IDs are a 404, not a server error.
+    if (error instanceof Error && error.name === 'NotFoundError') notFound();
     throw new Error('Could not retrieve report');
   }
 
