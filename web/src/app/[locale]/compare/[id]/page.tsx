@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { base64url } from '@/lib/helpers';
 import { getTestResult } from '@/actions';
 import { title } from '@/components/primitives';
@@ -15,16 +16,43 @@ type Person = {
   name: string;
 };
 
+// Malformed or unknown compare links should give a 404, not a server error.
+const parsePeople = (id: string): Person[] | null => {
+  let decoded: unknown;
+  try {
+    decoded = base64url.decode(id);
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(decoded) || decoded.length === 0) return null;
+  const isPerson = (p: unknown): p is Person =>
+    typeof p === 'object' &&
+    p !== null &&
+    typeof (p as Person).id === 'string' &&
+    typeof (p as Person).name === 'string';
+  return decoded.every(isPerson) ? decoded : null;
+};
+
+const isNotFoundError = (error: unknown): boolean =>
+  error instanceof Error && error.name === 'NotFoundError';
+
 export default async function ComparePage(props: ComparePageProps) {
   const params = await props.params;
 
   const { id } = params;
 
-  const people: Person[] = base64url.decode(id);
+  const people = parsePeople(id);
+  if (!people) notFound();
+
   const reports = await Promise.all(
     people.map(async (person) => {
-      const report = await getTestResult(person.id);
-      if (!report) throw new Error('No report found');
+      const report = await getTestResult(person.id).catch(
+        (error: unknown): never => {
+          if (isNotFoundError(error)) notFound();
+          throw error;
+        }
+      );
+      if (!report) notFound();
       return {
         name: person.name,
         report
