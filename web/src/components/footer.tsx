@@ -56,6 +56,12 @@ export default function Footer({ footerLinks }: FooterProps) {
         </NextUILink>
         &nbsp;project.
       </div>
+
+      <p className='text-sm text-gray-500 mt-4 text-center'>
+        Dr Elijah Ting holds an Executive Doctorate in Learning and Development
+        (ED – L&amp;D), a professional doctorate from East Bridge University, a
+        private university in Paris.
+      </p>
     </footer>
   );
 }
