@@ -4,6 +4,7 @@ import { getDb } from '@/db';
 import { notifyOwner, sendEnquiryEmail } from '@/lib/notify';
 import {
   MAIN_SITE_NOTICE_VERSION,
+  TYPES_SITE_ORIGIN,
   allowedOrigins,
   hrdCorp,
   needs,
@@ -114,7 +115,12 @@ export async function POST(request: Request) {
   });
   if (!parsed.success) return back(origin, 'error=invalid');
   const e = parsed.data;
-  const sourcePage = e.from?.startsWith('/') ? e.from : undefined;
+  const fromTypesSite = origin === TYPES_SITE_ORIGIN;
+  const site = fromTypesSite ? 'types.drelijah.org' : 'drelijah.org';
+  const path = e.from?.startsWith('/') ? e.from : undefined;
+  // drelijah.org pages are stored as a bare path (e.g. /prisma); pages on the
+  // types site carry its hostname (e.g. types.drelijah.org/contact).
+  const sourcePage = path && fromTypesSite ? `${site}${path}` : path;
 
   try {
     const db = await getDb();
@@ -166,7 +172,7 @@ export async function POST(request: Request) {
 
   await notifyOwner(
     [
-      'New scoping-call request on drelijah.org',
+      `New scoping-call request on ${site}`,
       `Name: ${e.name}`,
       `Email: ${e.email}`,
       e.phone && `Phone: ${e.phone}`,
