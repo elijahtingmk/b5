@@ -126,13 +126,14 @@ export async function POST(request: Request) {
   const site = fromTypesSite ? TYPES_SITE_HOST : 'drelijah.org';
   // drelijah.org pages are stored as a bare path (e.g. /prisma). Types pages
   // carry the hostname (e.g. types.drelijah.org/contact.html) so /admin can
-  // list them. Type fields are kept only when this post is from the types
-  // site and share_type is "1".
+  // list them. Type fields, including type_result_id, are kept only when
+  // this post is from the types site and share_type is "1".
   const sourcePage = sourcePageFor(fromTypesSite, e.from, TYPES_SITE_HOST);
   const shared = sharedTypeFromForm(fromTypesSite, {
     shareType: field('share_type'),
     typeCode: field('type_code'),
-    typeDetail: field('type_detail')
+    typeDetail: field('type_detail'),
+    typeResultId: field('type_result_id')
   });
 
   try {
@@ -140,8 +141,9 @@ export async function POST(request: Request) {
     await db
       .prepare(
         `INSERT INTO enquiries (name, email, organisation, need, size, hrd_corp,
-           phone, message, source_page, notice_version, type_code, type_detail)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+           phone, message, source_page, notice_version, type_code, type_detail,
+           type_result_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         e.name,
@@ -155,7 +157,8 @@ export async function POST(request: Request) {
         sourcePage ?? null,
         MAIN_SITE_NOTICE_VERSION,
         shared.typeCode,
-        shared.typeDetail
+        shared.typeDetail,
+        shared.typeResultId
       )
       .run();
   } catch (error) {
@@ -184,7 +187,8 @@ export async function POST(request: Request) {
     sourcePage,
     submittedAt,
     typeCode: shared.typeCode ?? undefined,
-    typeDetail: shared.typeDetail ?? undefined
+    typeDetail: shared.typeDetail ?? undefined,
+    typeResultId: shared.typeResultId ?? undefined
   });
 
   await notifyOwner(
@@ -198,7 +202,11 @@ export async function POST(request: Request) {
       e.size && `Size: ${sizes[e.size]}`,
       e.hrd && `HRD Corp claimable: ${hrdCorp[e.hrd]}`,
       sourcePage && `From page: ${sourcePage}`,
-      ...typeAlertLines(shared.typeCode, shared.typeDetail),
+      ...typeAlertLines(
+        shared.typeCode,
+        shared.typeDetail,
+        shared.typeResultId
+      ),
       e.message && `\n${e.message}`
     ]
       .filter(Boolean)

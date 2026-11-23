@@ -126,6 +126,7 @@ export type EnquiryEmailData = {
   // Set only when the person opted in on types.drelijah.org.
   typeCode?: string;
   typeDetail?: string;
+  typeResultId?: string;
 };
 
 // Sends an email via Google Apps Script relay if ENQUIRY_EMAIL_RELAY_URL and
@@ -148,7 +149,7 @@ export async function sendEnquiryEmail(data: EnquiryEmailData): Promise<void> {
     data.sizeLabel && `Size: ${data.sizeLabel}`,
     data.hrdLabel && `HRD Corp claimable: ${data.hrdLabel}`,
     data.sourcePage && `From page: ${data.sourcePage}`,
-    ...typeAlertLines(data.typeCode, data.typeDetail),
+    ...typeAlertLines(data.typeCode, data.typeDetail, data.typeResultId),
     `Submitted: ${data.submittedAt}`,
     '',
     data.message && data.message,
