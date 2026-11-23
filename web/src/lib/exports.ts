@@ -70,17 +70,26 @@ const facetColumns = facets
 export const typesLeadsWhere = "source_page LIKE 'types.drelijah.org%'";
 
 export const typesLeadsListSql = `SELECT created_at, name, email, organisation, need,
-      message, type_code, type_detail
+      message, type_code, type_detail, type_result_id
     FROM enquiries
     WHERE ${typesLeadsWhere}
     ORDER BY created_at DESC, id DESC`;
+
+export const typeResultsListSql = `SELECT id, created_at, type_code, type_detail
+    FROM type_results
+    ORDER BY created_at DESC, id DESC`;
+
+export const typeResultCountsSql = `SELECT type_code, count(*) AS n
+    FROM type_results
+    GROUP BY type_code`;
 
 export const adminCountsSql = `SELECT (SELECT count(*) FROM results) AS results,
             (SELECT count(*) FROM riasec_results) AS riasec,
             (SELECT count(*) FROM leads) AS leads,
             (SELECT count(*) FROM feedback) AS feedback,
             (SELECT count(*) FROM enquiries) AS enquiries,
-            (SELECT count(*) FROM enquiries WHERE ${typesLeadsWhere}) AS types`;
+            (SELECT count(*) FROM enquiries WHERE ${typesLeadsWhere}) AS types,
+            (SELECT count(*) FROM type_results) AS type_results`;
 
 export const exportQueries = {
   results: `SELECT r.id, r.date_stamp, r.lang, r.time_elapsed AS seconds,
@@ -104,12 +113,16 @@ export const exportQueries = {
   feedback: `SELECT created_at, name, email, message
     FROM feedback ORDER BY created_at DESC`,
   enquiries: `SELECT created_at, name, email, phone, organisation, need, size,
-      hrd_corp, message, source_page, notice_version, type_code, type_detail
+      hrd_corp, message, source_page, notice_version, type_code, type_detail,
+      type_result_id
     FROM enquiries ORDER BY created_at DESC`,
   types: `SELECT created_at, name, email, organisation, need, message,
-      type_code, type_detail, source_page
+      type_code, type_detail, type_result_id, source_page
     FROM enquiries
     WHERE ${typesLeadsWhere}
+    ORDER BY created_at DESC, id DESC`,
+  type_results: `SELECT id, created_at, type_code, type_detail
+    FROM type_results
     ORDER BY created_at DESC, id DESC`
 } as const;
 
@@ -121,6 +134,10 @@ export const exportTables: { id: ExportTable; label: string }[] = [
     label: 'Contact-form requests (drelijah.org and types.drelijah.org)'
   },
   { id: 'types', label: 'types.drelijah.org leads (type when shared)' },
+  {
+    id: 'type_results',
+    label: 'types.drelijah.org results (anonymous, no name or email)'
+  },
   { id: 'results', label: 'Big Five test results (with trait scores)' },
   { id: 'riasec', label: 'Career interest results (RIASEC scores)' },
   { id: 'leads', label: 'Enquiries (people who left their details)' },

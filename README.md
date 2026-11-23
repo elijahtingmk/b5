@@ -62,6 +62,9 @@ Tables:
 
 - `results`: one row per completed test, answers stored as JSON. No name or
   contact details.
+- `type_results`: one row per completed 16-type test from types.drelijah.org.
+  A 24-character result number, the four-letter type, and an optional short
+  note. No name or contact details.
 - `leads`: people who chose to leave their details on the results page. Each
   row stores the exact consent wording they agreed to and the notice version.
   `result_id` is only filled in when they also agreed to let you view their
@@ -85,17 +88,44 @@ Worker secret `TURNSTILE_SECRET`, and put its site key in the form's
 `data-turnstile-sitekey`. Requests appear on the admin page and via
 `pnpm run export:enquiries`.
 
-The types contact form may also send `share_type`, `type_code` and
-`type_detail`. Those are stored only when the post comes from
-types.drelijah.org and `share_type` is `1` (the person opted in). `type_code`
-must be a four-letter 16-type code such as ENTJ. `type_detail` is optional
-text, kept to 500 characters. The same fields on a drelijah.org post are
-ignored. Nothing is stored for someone who only took a test and did not
-submit the contact form. When a type was stored, the code and any short detail are added to the
-existing Telegram and email alerts. Where those alerts go is unchanged.
+The types contact form may also send `share_type`, `type_code`,
+`type_detail`, and `type_result_id`. Those are stored only when the post
+comes from types.drelijah.org and `share_type` is `1` (the person opted in).
+`type_code` must be a four-letter 16-type code such as ENTJ. `type_detail`
+is optional text, kept to 500 characters. `type_result_id` is the result
+number from a completed test (24 hex characters). If `share_type` is not
+`1`, all of those fields are ignored, including on a drelijah.org post.
+When a type or result number was stored, it is added to the existing
+Telegram and email alerts. Where those alerts go is unchanged. Saving a
+completed test does not send an alert.
 
 Types leads are listed on the admin page. `source_page` for that site looks
 like `types.drelijah.org/contact.html`.
+
+### Anonymous 16-type results
+
+When someone finishes a test on types.drelijah.org, that site posts JSON to
+`https://big5.drelijah.org/api/types-result`. The endpoint accepts the post
+only from `https://types.drelijah.org`.
+
+```json
+{ "type_code": "ENTJ", "type_detail": "Te clearly over Ti" }
+```
+
+`type_code` is required. `type_detail` is optional. Name, email, and any
+other fields are ignored. A successful response is JSON:
+
+```json
+{ "id": "0123456789abcdef01234567" }
+```
+
+The `id` is the result number (24 lowercase hex characters). The row is
+stored in `type_results`. No Telegram message and no email is sent.
+
+The admin page lists those rows (Malaysia time, result number, type, and
+detail when present) and shows how many saved tests there are of each
+four-letter type. Search matches a result number or a type. Download them
+from the page, or with `pnpm run export:type-results`.
 
 ### Career interest checklist (RIASEC)
 
@@ -119,7 +149,8 @@ approved it.
 feedback messages there are, with a **Download CSV** button for each. The
 same page lists types.drelijah.org contact leads (name, email, organisation,
 topic, message, date, and the 16-type result when the person opted in) and
-has its own CSV. Files open in Excel.
+the anonymous result numbers from completed tests, with a count for each
+type. Each list has its own CSV. Files open in Excel.
 
 It is switched off until you set a password:
 
@@ -147,10 +178,12 @@ pnpm run export:leads     # leads.csv: name, email, role, consent wording, linke
 pnpm run export:feedback  # feedback.csv
 pnpm run export:enquiries # enquiries.csv: every contact form, including types
 pnpm run export:types     # types.csv: types.drelijah.org leads only
+pnpm run export:type-results # type_results.csv: anonymous result numbers, no name or email
 ```
 
-The CSV files contain personal data. They are git-ignored; keep them off shared
-drives and delete them when you are done.
+The contact-form CSV files contain personal data. They are git-ignored; keep
+them off shared drives and delete them when you are done. `type_results.csv`
+has no name or email.
 
 ### Telegram alerts for new enquiries
 
@@ -187,7 +220,12 @@ console:
 DELETE FROM leads WHERE email = 'person@example.com';
 DELETE FROM results WHERE id = '<their result id>';
 DELETE FROM enquiries WHERE email = 'person@example.com';
+DELETE FROM type_results WHERE id = '<their result number>';
 ```
+
+A 16-type result number has no email on it. Delete that row by the id the
+person was given, or by the `type_result_id` stored on their enquiry if they
+opted in to share it.
 
 The notice also says contact details are kept for up to two years after the
 last contact. If you change the wording on the results page or the privacy

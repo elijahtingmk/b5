@@ -4,10 +4,19 @@ import {
   TYPES_PAGE_LIMIT,
   leadMatches,
   renderAdminPage,
+  serialMatches,
+  type TypeResultRow,
   type TypesLeadRow
 } from '@/lib/admin-page';
 import { adminHeaders, requireAdmin } from '@/lib/admin-auth';
-import { adminCountsSql, exportTables, typesLeadsListSql } from '@/lib/exports';
+import {
+  adminCountsSql,
+  exportTables,
+  typeResultCountsSql,
+  typeResultsListSql,
+  typesLeadsListSql
+} from '@/lib/exports';
+import { countsByType } from '@/lib/type-share';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,14 +44,32 @@ export async function GET(request: Request) {
     : listed.results;
   const typesLeads = pool.filter((lead) => leadMatches(lead, query, needs));
 
+  const resultListed = await db
+    .prepare(`${typeResultsListSql} LIMIT ?`)
+    .bind(TYPES_PAGE_LIMIT + 1)
+    .all<TypeResultRow>();
+  const resultsCapped = resultListed.results.length > TYPES_PAGE_LIMIT;
+  const resultPool = resultsCapped
+    ? resultListed.results.slice(0, TYPES_PAGE_LIMIT)
+    : resultListed.results;
+  const typeResults = resultPool.filter((row) => serialMatches(row, query));
+  const counted = await db
+    .prepare(typeResultCountsSql)
+    .all<{ type_code: string; n: number }>();
+  const typeCounts = countsByType(counted.results);
+
   const html = renderAdminPage({
     downloads: exportTables,
     counts,
     topicLabels: needs,
     typesLeads,
     typesTotal: Number(counts.types ?? 0),
+    typeResults,
+    typeResultTotal: typeCounts.reduce((sum, row) => sum + row.count, 0),
+    typeCounts,
     query,
-    listCapped
+    listCapped,
+    resultsCapped
   });
 
   return new Response(html, {

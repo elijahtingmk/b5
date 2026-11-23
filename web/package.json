@@ -19,6 +19,7 @@
     "export:feedback": "node scripts/export-csv.mjs feedback",
     "export:enquiries": "node scripts/export-csv.mjs enquiries",
     "export:types": "node scripts/export-csv.mjs types",
+    "export:type-results": "node scripts/export-csv.mjs type_results",
     "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test test/types-leads.test.mjs"
   },
   "dependencies": {

@@ -13,44 +13,47 @@ import {
   escapeHtml,
   formatStoredDate,
   leadMatches,
-  renderAdminPage
+  renderAdminPage,
+  serialMatches
 } from '../src/lib/admin-page.ts';
 import { toCsv } from '../src/lib/csv.ts';
 import {
   adminCountsSql,
   exportQueries,
   exportTables,
+  typeResultCountsSql,
+  typeResultsListSql,
   typesLeadsListSql,
   typesLeadsWhere
 } from '../src/lib/exports.ts';
 import {
+  TYPE_RESULT_BODY_MAX,
+  isJsonContentType,
+  readLimitedBody
+} from '../src/lib/type-result.ts';
+import {
+  TYPE_CODES,
   TYPE_DETAIL_MAX,
+  countsByType,
   enquiryReturnLocation,
+  normaliseResultId,
   normaliseTypeCode,
+  parseTypeResultPayload,
   sharedTypeFromForm,
   sourcePageFor,
-  typeAlertLines
+  typeAlertLines,
+  typeResultCors
 } from '../src/lib/type-share.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const CODES = [
-  'ENTJ',
-  'ENTP',
-  'ENFJ',
-  'ENFP',
-  'ESTJ',
-  'ESTP',
-  'ESFJ',
-  'ESFP',
-  'INTJ',
-  'INTP',
-  'INFJ',
-  'INFP',
-  'ISTJ',
-  'ISTP',
-  'ISFJ',
-  'ISFP'
-];
+const SERIAL = '0123456789abcdef01234567';
+
+const emptyResults = {
+  typeResults: [],
+  typeResultTotal: 0,
+  typeCounts: countsByType([]),
+  resultsCapped: false
+};
 
 function migrate() {
   const db = new DatabaseSync(':memory:');
@@ -64,8 +67,9 @@ function migrate() {
 function insertEnquiry(db, row) {
   db.prepare(
     `INSERT INTO enquiries (name, email, organisation, need, size, hrd_corp,
-       phone, message, source_page, notice_version, type_code, type_detail)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       phone, message, source_page, notice_version, type_code, type_detail,
+       type_result_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     row.name,
     row.email,
@@ -78,13 +82,31 @@ function insertEnquiry(db, row) {
     row.source_page ?? null,
     '2026-10-04',
     row.type_code ?? null,
-    row.type_detail ?? null
+    row.type_detail ?? null,
+    row.type_result_id ?? null
   );
 }
 
+function insertTypeResult(db, row) {
+  db.prepare(
+    `INSERT INTO type_results (id, type_code, type_detail, created_at)
+     VALUES (?, ?, ?, ?)`
+  ).run(row.id, row.type_code, row.type_detail ?? null, row.created_at);
+}
+
 test('type codes are the sixteen letter pairs only', () => {
-  assert.equal(CODES.length, 16);
-  for (const code of CODES) {
+  const axes = ['EI', 'NS', 'TF', 'JP'];
+  const all = [];
+  for (const a of axes[0]) {
+    for (const b of axes[1]) {
+      for (const c of axes[2]) {
+        for (const d of axes[3]) all.push(a + b + c + d);
+      }
+    }
+  }
+  assert.equal(TYPE_CODES.length, 16);
+  assert.deepEqual(new Set(TYPE_CODES), new Set(all));
+  for (const code of TYPE_CODES) {
     assert.equal(normaliseTypeCode(code), code);
     assert.equal(normaliseTypeCode(code.toLowerCase()), code);
     assert.equal(normaliseTypeCode(`  ${code}  `), code);
@@ -111,12 +133,13 @@ test('type fields are stored only from the types site with share_type 1', () => 
   });
   assert.deepEqual(opted, {
     typeCode: 'INFP',
-    typeDetail: 'N slightly over S'
+    typeDetail: 'N slightly over S',
+    typeResultId: null
   });
 
   assert.deepEqual(
     sharedTypeFromForm(true, { shareType: ' 1 ', typeCode: 'ENTJ' }),
-    { typeCode: 'ENTJ', typeDetail: null }
+    { typeCode: 'ENTJ', typeDetail: null, typeResultId: null }
   );
 
   for (const shareType of [undefined, '', '0', 'true', 'on', 'yes']) {
@@ -124,9 +147,10 @@ test('type fields are stored only from the types site with share_type 1', () => 
       sharedTypeFromForm(true, {
         shareType,
         typeCode: 'ENTJ',
-        typeDetail: 'should not be kept'
+        typeDetail: 'should not be kept',
+        typeResultId: SERIAL
       }),
-      { typeCode: null, typeDetail: null }
+      { typeCode: null, typeDetail: null, typeResultId: null }
     );
   }
 
@@ -134,10 +158,39 @@ test('type fields are stored only from the types site with share_type 1', () => 
     sharedTypeFromForm(false, {
       shareType: '1',
       typeCode: 'ENTJ',
-      typeDetail: 'from drelijah.org'
+      typeDetail: 'from drelijah.org',
+      typeResultId: SERIAL
     }),
-    { typeCode: null, typeDetail: null }
+    { typeCode: null, typeDetail: null, typeResultId: null }
   );
+
+  assert.equal(
+    sharedTypeFromForm(true, {
+      shareType: '1',
+      typeCode: 'infp',
+      typeResultId: `  ${SERIAL.toUpperCase()}  `
+    }).typeResultId,
+    SERIAL
+  );
+  assert.equal(normaliseResultId(SERIAL), SERIAL);
+  for (const bad of [
+    SERIAL.slice(0, 23),
+    `${SERIAL}a`,
+    'gggggggggggggggggggggggg',
+    '0123456789abcdef0123456g',
+    '',
+    undefined
+  ]) {
+    assert.equal(normaliseResultId(bad), null);
+    assert.equal(
+      sharedTypeFromForm(true, {
+        shareType: '1',
+        typeCode: 'ENTJ',
+        typeResultId: bad
+      }).typeResultId,
+      null
+    );
+  }
 
   const invalidCode = sharedTypeFromForm(true, {
     shareType: '1',
@@ -166,13 +219,29 @@ test('alerts mention a type only when one was stored', () => {
     'Type: ENTJ',
     'Type detail: Te then Ni'
   ]);
+  assert.deepEqual(typeAlertLines(stored.typeCode, stored.typeDetail, SERIAL), [
+    'Type: ENTJ',
+    'Type detail: Te then Ni',
+    `Result number: ${SERIAL}`
+  ]);
+  assert.deepEqual(typeAlertLines(null, null, SERIAL), [
+    `Result number: ${SERIAL}`
+  ]);
 
   const declined = sharedTypeFromForm(true, {
     shareType: '',
     typeCode: 'ENTJ',
-    typeDetail: 'secret'
+    typeDetail: 'secret',
+    typeResultId: SERIAL
   });
-  assert.deepEqual(typeAlertLines(declined.typeCode, declined.typeDetail), []);
+  assert.deepEqual(
+    typeAlertLines(
+      declined.typeCode,
+      declined.typeDetail,
+      declined.typeResultId
+    ),
+    []
+  );
   assert.deepEqual(typeAlertLines(null, null), []);
 });
 
@@ -326,7 +395,8 @@ test('admin page lists types leads and escapes what people typed', () => {
     need: 'types16',
     message: 'Hello\n<img src=x onerror=alert(1)>',
     type_code: 'ENTJ',
-    type_detail: 'Te over Ti'
+    type_detail: 'Te over Ti',
+    type_result_id: SERIAL
   };
   const declined = {
     created_at: '2026-11-22 02:00:00',
@@ -336,6 +406,19 @@ test('admin page lists types leads and escapes what people typed', () => {
     need: 'coaching',
     message: null,
     type_code: null,
+    type_detail: null,
+    type_result_id: null
+  };
+  const serial = {
+    id: SERIAL,
+    created_at: '2026-11-23 00:30:00',
+    type_code: 'ENTJ',
+    type_detail: 'Te <over> Ti'
+  };
+  const other = {
+    id: 'abcdef0123456789abcdef01',
+    created_at: '2026-11-22 01:00:00',
+    type_code: 'INFP',
     type_detail: null
   };
   const html = renderAdminPage({
@@ -343,6 +426,7 @@ test('admin page lists types leads and escapes what people typed', () => {
     counts: {
       enquiries: 2,
       types: 2,
+      type_results: 2,
       results: 0,
       riasec: 0,
       leads: 0,
@@ -351,8 +435,15 @@ test('admin page lists types leads and escapes what people typed', () => {
     topicLabels: needs,
     typesLeads: [tricky, declined],
     typesTotal: 2,
+    typeResults: [serial, other],
+    typeResultTotal: 2,
+    typeCounts: countsByType([
+      { type_code: 'ENTJ', n: 1 },
+      { type_code: 'INFP', n: 1 }
+    ]),
     query: '',
-    listCapped: false
+    listCapped: false,
+    resultsCapped: false
   });
 
   assert.match(html, /types<span>\.drelijah\.org<\/span> leads/);
@@ -362,22 +453,50 @@ test('admin page lists types leads and escapes what people typed', () => {
   assert.match(html, /Hello\n&lt;img src=x onerror=alert\(1\)&gt;/);
   assert.match(html, /ENTJ/);
   assert.match(html, /Te over Ti/);
+  assert.match(html, new RegExp(`Result ${SERIAL}`));
   assert.match(html, /Not shared/);
   assert.match(html, /mailto:aina@example.com/);
   assert.match(html, /href="\/admin\/export\/types"/);
   assert.match(html, /href="\/admin\/export\/enquiries"/);
+  assert.match(html, /href="\/admin\/export\/type_results"/);
   assert.match(html, />2 records</);
+  assert.match(html, /Counts by type/);
+  assert.match(html, /td::before\{[^}]*font:600 \.72rem\/1\.3 "Source Sans 3"/);
+  assert.match(html, />ISFP<\/strong><span class="n">0<\/span>/);
+  assert.match(html, />ENTJ<\/strong><span class="n">1<\/span>/);
+  const serialTable = html.slice(
+    html.indexOf('<table class="serials">'),
+    html.indexOf('</table>', html.indexOf('<table class="serials">'))
+  );
+  assert.match(serialTable, /Result number/);
+  assert.match(serialTable, /Te &lt;over&gt; Ti/);
+  assert.match(serialTable, new RegExp(SERIAL));
+  assert.doesNotMatch(serialTable, /Name|Email|Organisation|@/);
+  assert.equal(serialMatches(serial, SERIAL), true);
+  assert.equal(serialMatches(serial, 'entj'), true);
+  assert.equal(serialMatches(serial, 'over'), true);
+  assert.equal(serialMatches(other, SERIAL), false);
+  assert.equal(leadMatches(tricky, SERIAL, needs), true);
+  assert.equal(leadMatches(declined, SERIAL, needs), false);
+  assert.equal(countsByType([]).length, 16);
+  assert.equal(
+    countsByType([]).every((row) => row.count === 0),
+    true
+  );
   assert.doesNotMatch(html, /<script>/);
   assert.doesNotMatch(html, /MBTI|Myers-Briggs|Myers Briggs/i);
   assert.match(formatStoredDate(tricky.created_at), /23 Nov 2026/);
   assert.match(formatStoredDate(tricky.created_at), /08:30/);
 
   const searched = renderAdminPage({
+    ...emptyResults,
     downloads: [],
     counts: { types: 2 },
     topicLabels: needs,
     typesLeads: [tricky].filter((lead) => leadMatches(lead, 'entj', needs)),
     typesTotal: 2,
+    typeResults: [serial].filter((row) => serialMatches(row, 'entj')),
+    typeResultTotal: 2,
     query: '"><script>',
     listCapped: false
   });
@@ -401,7 +520,12 @@ test('enquiry route and alerts keep the opt-in gate', () => {
   const csv = readFileSync(join(root, 'scripts/export-csv.mjs'), 'utf8');
   assert.match(route, /sharedTypeFromForm\(fromTypesSite/);
   assert.match(route, /typeCode: shared\.typeCode/);
-  assert.match(route, /typeAlertLines\(shared\.typeCode, shared\.typeDetail\)/);
+  assert.match(
+    route,
+    /typeAlertLines\(\s*shared\.typeCode,\s*shared\.typeDetail,\s*shared\.typeResultId\s*\)/
+  );
+  assert.match(route, /type_result_id/);
+  assert.match(route, /typeResultId: field\('type_result_id'\)/);
   assert.match(
     route,
     /enquiryReturnLocation\(origin, query, TYPES_SITE_ORIGIN\)/
@@ -409,7 +533,10 @@ test('enquiry route and alerts keep the opt-in gate', () => {
   assert.match(route, /notifyOwner\(/);
   assert.match(route, /sendEnquiryEmail\(/);
   assert.match(notify, /sendOwnerEmail\(/);
-  assert.match(notify, /typeAlertLines\(data\.typeCode, data\.typeDetail\)/);
+  assert.match(
+    notify,
+    /typeAlertLines\(data\.typeCode, data\.typeDetail, data\.typeResultId\)/
+  );
   assert.match(notify, /ENQUIRY_EMAIL_RELAY_URL/);
   assert.match(notify, /TELEGRAM_BOT_TOKEN/);
   assert.match(csv, /source_page LIKE 'types\.drelijah\.org%'/);
@@ -426,9 +553,227 @@ test('enquiry route and alerts keep the opt-in gate', () => {
     'src/lib/type-share.ts',
     'src/config/enquiry.ts',
     'migrations/0005_enquiry_type_share.sql',
+    'migrations/0006_type_results.sql',
+    'src/app/api/types-result/route.ts',
+    'src/lib/type-result.ts',
     'scripts/export-csv.mjs'
   ];
   for (const file of files) {
     assert.doesNotMatch(readFileSync(join(root, file), 'utf8'), banned, file);
   }
+});
+
+test('type_results stores a serial and a type, and nothing identifying', () => {
+  const db = migrate();
+  const columns = db
+    .prepare('PRAGMA table_info(type_results)')
+    .all()
+    .map((column) => column.name);
+  assert.deepEqual(columns, ['id', 'type_code', 'type_detail', 'created_at']);
+
+  insertTypeResult(db, {
+    id: SERIAL,
+    type_code: 'ENTJ',
+    type_detail: 'Te over Ti',
+    created_at: '2026-11-23 00:30:00'
+  });
+  insertTypeResult(db, {
+    id: 'abcdef0123456789abcdef01',
+    type_code: 'INFP',
+    type_detail: null,
+    created_at: '2026-11-22 01:00:00'
+  });
+  insertTypeResult(db, {
+    id: 'abcdef0123456789abcdef02',
+    type_code: 'ENTJ',
+    type_detail: null,
+    created_at: '2026-11-21 01:00:00'
+  });
+
+  const listed = db.prepare(typeResultsListSql).all();
+  assert.deepEqual(
+    listed.map((row) => row.id),
+    [SERIAL, 'abcdef0123456789abcdef01', 'abcdef0123456789abcdef02']
+  );
+  const byType = countsByType(db.prepare(typeResultCountsSql).all());
+  assert.equal(byType.find((row) => row.code === 'ENTJ').count, 2);
+  assert.equal(byType.find((row) => row.code === 'INFP').count, 1);
+  assert.equal(byType.find((row) => row.code === 'ISFP').count, 0);
+  assert.equal(byType.length, 16);
+  assert.equal(db.prepare(adminCountsSql).get().type_results, 3);
+
+  const exported = db.prepare(exportQueries.type_results).all();
+  assert.deepEqual(Object.keys(exported[0]), [
+    'id',
+    'created_at',
+    'type_code',
+    'type_detail'
+  ]);
+  assert.doesNotMatch(
+    exportQueries.type_results,
+    /name|email|organisation|phone/i
+  );
+
+  insertEnquiry(db, {
+    name: 'Fixture Lead',
+    email: 'fixture@example.com',
+    need: 'types16',
+    source_page: 'types.drelijah.org/contact.html',
+    type_code: 'ENTJ',
+    type_detail: 'Te over Ti',
+    type_result_id: SERIAL
+  });
+  assert.equal(db.prepare(typesLeadsListSql).get().type_result_id, SERIAL);
+
+  assert.throws(() =>
+    insertTypeResult(db, {
+      id: 'short',
+      type_code: 'ENTJ',
+      created_at: '2026-11-23 00:30:00'
+    })
+  );
+  assert.throws(() =>
+    insertTypeResult(db, {
+      id: SERIAL.toUpperCase(),
+      type_code: 'ENTJ',
+      created_at: '2026-11-23 00:30:00'
+    })
+  );
+  assert.throws(() =>
+    insertTypeResult(db, {
+      id: 'fedcba9876543210fedcba98',
+      type_code: 'entj',
+      created_at: '2026-11-23 00:30:00'
+    })
+  );
+  assert.throws(() =>
+    insertTypeResult(db, {
+      id: 'fedcba9876543210fedcba99',
+      type_code: 'ENTJ',
+      type_detail: 'z'.repeat(501),
+      created_at: '2026-11-23 00:30:00'
+    })
+  );
+  assert.throws(() =>
+    insertEnquiry(db, {
+      name: 'Bad Serial',
+      email: 'bad-serial@example.com',
+      need: 'types16',
+      source_page: 'types.drelijah.org/contact.html',
+      type_result_id: 'not-a-serial'
+    })
+  );
+});
+
+test('type result payload keeps the type and drops identity fields', async () => {
+  assert.equal(typeResultCors('https://drelijah.org', TYPES_SITE_ORIGIN), null);
+  assert.equal(
+    typeResultCors('https://www.drelijah.org', TYPES_SITE_ORIGIN),
+    null
+  );
+  assert.equal(
+    typeResultCors('http://localhost:3000', TYPES_SITE_ORIGIN),
+    null
+  );
+  assert.equal(typeResultCors(null, TYPES_SITE_ORIGIN), null);
+  const headers = typeResultCors(TYPES_SITE_ORIGIN, TYPES_SITE_ORIGIN);
+  assert.equal(headers['Access-Control-Allow-Origin'], TYPES_SITE_ORIGIN);
+  assert.match(headers['Access-Control-Allow-Methods'], /POST/);
+  assert.equal(isJsonContentType('application/json; charset=utf-8'), true);
+  assert.equal(isJsonContentType('text/plain'), false);
+
+  const parsed = parseTypeResultPayload({
+    type_code: ' infp ',
+    type_detail: '  N over S  ',
+    name: 'Aina',
+    email: 'aina@example.com',
+    organisation: 'Northwind',
+    ip: '203.0.113.4'
+  });
+  assert.deepEqual(parsed, {
+    ok: true,
+    typeCode: 'INFP',
+    typeDetail: 'N over S'
+  });
+  assert.equal('email' in parsed, false);
+  assert.equal('name' in parsed, false);
+
+  assert.deepEqual(parseTypeResultPayload({ type_code: 'ESTJ' }), {
+    ok: true,
+    typeCode: 'ESTJ',
+    typeDetail: null
+  });
+  assert.deepEqual(
+    parseTypeResultPayload({ type_code: 'ESTJ', type_detail: '   ' }),
+    { ok: true, typeCode: 'ESTJ', typeDetail: null }
+  );
+  const long = parseTypeResultPayload({
+    type_code: 'ESTJ',
+    type_detail: 'y'.repeat(TYPE_DETAIL_MAX + 40)
+  });
+  assert.equal(long.ok && long.typeDetail.length, TYPE_DETAIL_MAX);
+
+  for (const value of [
+    null,
+    [],
+    'ENTJ',
+    {},
+    { type_code: 'ENTX' },
+    { type_code: 'ENTJ', type_detail: 12 }
+  ]) {
+    assert.deepEqual(parseTypeResultPayload(value), { ok: false });
+  }
+
+  const oversized = 'x'.repeat(TYPE_RESULT_BODY_MAX + 50);
+  const refused = await readLimitedBody(
+    new Request('https://big5.drelijah.org/api/types-result', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': String(oversized.length)
+      },
+      body: oversized
+    }),
+    TYPE_RESULT_BODY_MAX
+  );
+  assert.equal(refused.ok, false);
+  assert.equal(refused.status, 413);
+
+  const small = JSON.stringify({
+    type_code: 'ENTJ',
+    email: 'ignored@example.com'
+  });
+  const accepted = await readLimitedBody(
+    new Request('https://big5.drelijah.org/api/types-result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: small
+    }),
+    TYPE_RESULT_BODY_MAX
+  );
+  assert.equal(accepted.ok, true);
+  assert.equal(accepted.text, small);
+
+  const route = readFileSync(
+    join(root, 'src/app/api/types-result/route.ts'),
+    'utf8'
+  );
+  const csv = readFileSync(join(root, 'scripts/export-csv.mjs'), 'utf8');
+  assert.match(
+    route,
+    /INSERT INTO type_results \(id, type_code, type_detail\)/
+  );
+  assert.match(
+    route,
+    /typeResultCors\(request\.headers\.get\('Origin'\), TYPES_SITE_ORIGIN\)/
+  );
+  assert.match(route, /return json\(\{ id \}/);
+  assert.doesNotMatch(
+    route,
+    /notifyOwner|sendEnquiryEmail|sendOwnerEmail|TELEGRAM|ENQUIRY_EMAIL/
+  );
+  assert.match(
+    csv,
+    /type_results: `SELECT id, created_at, type_code, type_detail/
+  );
 });
