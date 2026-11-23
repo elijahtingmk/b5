@@ -69,16 +69,33 @@ Tables:
 - `feedback`: the form on the About page.
 - `views`: article view counts.
 
-### Scoping-call form on drelijah.org
+### Scoping-call forms
 
-The contact page on drelijah.org posts to `https://big5.drelijah.org/api/enquiry`.
-The endpoint only accepts posts from `https://drelijah.org` (and `www.`), saves
-them in the `enquiries` table, sends a Telegram alert, and redirects back to
-`drelijah.org/contact?sent=1#book` (or `?error=…`). Bot traps: a hidden field and
-a minimum fill time of three seconds. To add Cloudflare Turnstile, create a widget
-for drelijah.org, set its secret as the Worker secret `TURNSTILE_SECRET`, and put
-its site key in the form's `data-turnstile-sitekey` on drelijah.org. Requests
-appear on the admin page and via `pnpm run export:enquiries`.
+The contact pages on drelijah.org and types.drelijah.org post to
+`https://big5.drelijah.org/api/enquiry`. The endpoint only accepts posts from
+`https://drelijah.org` (and `www.`) and `https://types.drelijah.org`. It saves
+them in the `enquiries` table, sends the same Telegram alert and email as
+before, and redirects back. drelijah.org returns to `/contact?sent=1#book`
+(or `?error=…`). types.drelijah.org returns to `/contact.html?sent=1#book`,
+which is that site's contact page.
+
+Bot traps: a hidden field and a minimum fill time of three seconds. To add
+Cloudflare Turnstile, create a widget for the site, set its secret as the
+Worker secret `TURNSTILE_SECRET`, and put its site key in the form's
+`data-turnstile-sitekey`. Requests appear on the admin page and via
+`pnpm run export:enquiries`.
+
+The types contact form may also send `share_type`, `type_code` and
+`type_detail`. Those are stored only when the post comes from
+types.drelijah.org and `share_type` is `1` (the person opted in). `type_code`
+must be a four-letter 16-type code such as ENTJ. `type_detail` is optional
+text, kept to 500 characters. The same fields on a drelijah.org post are
+ignored. Nothing is stored for someone who only took a test and did not
+submit the contact form. When a type was stored, the code and any short detail are added to the
+existing Telegram and email alerts. Where those alerts go is unchanged.
+
+Types leads are listed on the admin page. `source_page` for that site looks
+like `types.drelijah.org/contact.html`.
 
 ### Career interest checklist (RIASEC)
 
@@ -99,8 +116,10 @@ approved it.
 ### Private download page
 
 `https://big5.drelijah.org/admin` shows how many results, enquiries and
-feedback messages there are, with a **Download CSV** button for each. Files
-open in Excel.
+feedback messages there are, with a **Download CSV** button for each. The
+same page lists types.drelijah.org contact leads (name, email, organisation,
+topic, message, date, and the 16-type result when the person opted in) and
+has its own CSV. Files open in Excel.
 
 It is switched off until you set a password:
 
@@ -126,6 +145,8 @@ pnpm run export:results   # results.csv: one row per test with the five trait sc
 pnpm run export:riasec    # riasec.csv: one row per career interest checklist, six scores (0-10)
 pnpm run export:leads     # leads.csv: name, email, role, consent wording, linked result
 pnpm run export:feedback  # feedback.csv
+pnpm run export:enquiries # enquiries.csv: every contact form, including types
+pnpm run export:types     # types.csv: types.drelijah.org leads only
 ```
 
 The CSV files contain personal data. They are git-ignored; keep them off shared
@@ -165,6 +186,7 @@ console:
 ```sql
 DELETE FROM leads WHERE email = 'person@example.com';
 DELETE FROM results WHERE id = '<their result id>';
+DELETE FROM enquiries WHERE email = 'person@example.com';
 ```
 
 The notice also says contact details are kept for up to two years after the

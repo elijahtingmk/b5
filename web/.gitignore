@@ -45,3 +45,7 @@ next-env.d.ts
 # exports (contain personal data)
 /results.csv
 /leads.csv
+/riasec.csv
+/feedback.csv
+/enquiries.csv
+/types.csv
