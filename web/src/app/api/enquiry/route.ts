@@ -3,7 +3,14 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { notifyOwner, sendEnquiryEmail } from '@/lib/notify';
 import {
+  enquiryReturnLocation,
+  sharedTypeFromForm,
+  sourcePageFor,
+  typeAlertLines
+} from '@/lib/type-share';
+import {
   MAIN_SITE_NOTICE_VERSION,
+  TYPES_SITE_HOST,
   TYPES_SITE_ORIGIN,
   allowedOrigins,
   hrdCorp,
@@ -43,7 +50,7 @@ function back(origin: string, query: string) {
   return new Response(null, {
     status: 303,
     headers: {
-      Location: `${origin}/contact?${query}#book`,
+      Location: enquiryReturnLocation(origin, query, TYPES_SITE_ORIGIN),
       'Cache-Control': 'no-store'
     }
   });
@@ -116,19 +123,25 @@ export async function POST(request: Request) {
   if (!parsed.success) return back(origin, 'error=invalid');
   const e = parsed.data;
   const fromTypesSite = origin === TYPES_SITE_ORIGIN;
-  const site = fromTypesSite ? 'types.drelijah.org' : 'drelijah.org';
-  const path = e.from?.startsWith('/') ? e.from : undefined;
-  // drelijah.org pages are stored as a bare path (e.g. /prisma); pages on the
-  // types site carry its hostname (e.g. types.drelijah.org/contact).
-  const sourcePage = path && fromTypesSite ? `${site}${path}` : path;
+  const site = fromTypesSite ? TYPES_SITE_HOST : 'drelijah.org';
+  // drelijah.org pages are stored as a bare path (e.g. /prisma). Types pages
+  // carry the hostname (e.g. types.drelijah.org/contact.html) so /admin can
+  // list them. Type fields are kept only when this post is from the types
+  // site and share_type is "1".
+  const sourcePage = sourcePageFor(fromTypesSite, e.from, TYPES_SITE_HOST);
+  const shared = sharedTypeFromForm(fromTypesSite, {
+    shareType: field('share_type'),
+    typeCode: field('type_code'),
+    typeDetail: field('type_detail')
+  });
 
   try {
     const db = await getDb();
     await db
       .prepare(
         `INSERT INTO enquiries (name, email, organisation, need, size, hrd_corp,
-           phone, message, source_page, notice_version)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+           phone, message, source_page, notice_version, type_code, type_detail)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         e.name,
@@ -140,7 +153,9 @@ export async function POST(request: Request) {
         e.phone ?? null,
         e.message ?? null,
         sourcePage ?? null,
-        MAIN_SITE_NOTICE_VERSION
+        MAIN_SITE_NOTICE_VERSION,
+        shared.typeCode,
+        shared.typeDetail
       )
       .run();
   } catch (error) {
@@ -167,7 +182,9 @@ export async function POST(request: Request) {
     phone: e.phone,
     message: e.message,
     sourcePage,
-    submittedAt
+    submittedAt,
+    typeCode: shared.typeCode ?? undefined,
+    typeDetail: shared.typeDetail ?? undefined
   });
 
   await notifyOwner(
@@ -181,6 +198,7 @@ export async function POST(request: Request) {
       e.size && `Size: ${sizes[e.size]}`,
       e.hrd && `HRD Corp claimable: ${hrdCorp[e.hrd]}`,
       sourcePage && `From page: ${sourcePage}`,
+      ...typeAlertLines(shared.typeCode, shared.typeDetail),
       e.message && `\n${e.message}`
     ]
       .filter(Boolean)

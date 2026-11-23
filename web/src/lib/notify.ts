@@ -1,4 +1,5 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { typeAlertLines } from '@/lib/type-share';
 
 type NotifyEnv = {
   TELEGRAM_BOT_TOKEN?: string;
@@ -122,15 +123,16 @@ export type EnquiryEmailData = {
   message?: string;
   sourcePage?: string;
   submittedAt: string;
+  // Set only when the person opted in on types.drelijah.org.
+  typeCode?: string;
+  typeDetail?: string;
 };
 
 // Sends an email via Google Apps Script relay if ENQUIRY_EMAIL_RELAY_URL and
 // ENQUIRY_EMAIL_RELAY_TOKEN are set as Worker secrets; otherwise does nothing.
 // Never throws: the submission is already saved, and a failed alert must not
 // turn into an error for the visitor.
-export async function sendEnquiryEmail(
-  data: EnquiryEmailData
-): Promise<void> {
+export async function sendEnquiryEmail(data: EnquiryEmailData): Promise<void> {
   const strip = (s: string) => s.replace(/[\r\n]+/g, ' ').trim();
   const orgOrName = data.organisation?.trim() || data.name;
   const subjectPrefix =
@@ -146,6 +148,7 @@ export async function sendEnquiryEmail(
     data.sizeLabel && `Size: ${data.sizeLabel}`,
     data.hrdLabel && `HRD Corp claimable: ${data.hrdLabel}`,
     data.sourcePage && `From page: ${data.sourcePage}`,
+    ...typeAlertLines(data.typeCode, data.typeDetail),
     `Submitted: ${data.submittedAt}`,
     '',
     data.message && data.message,

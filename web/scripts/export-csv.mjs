@@ -98,8 +98,13 @@ const queries = {
   feedback: `SELECT created_at, name, email, message
     FROM feedback ORDER BY created_at DESC`,
   enquiries: `SELECT created_at, name, email, phone, organisation, need, size,
-      hrd_corp, message, source_page, notice_version
-    FROM enquiries ORDER BY created_at DESC`
+      hrd_corp, message, source_page, notice_version, type_code, type_detail
+    FROM enquiries ORDER BY created_at DESC`,
+  types: `SELECT created_at, name, email, organisation, need, message,
+      type_code, type_detail, source_page
+    FROM enquiries
+    WHERE source_page LIKE 'types.drelijah.org%'
+    ORDER BY created_at DESC, id DESC`
 };
 
 const [table, ...flags] = process.argv.slice(2);

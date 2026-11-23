@@ -14,6 +14,7 @@ export const allowedOrigins = [
 // The 16-type personality profile site. Enquiries from it are labelled with
 // its hostname so they can be told apart from drelijah.org ones.
 export const TYPES_SITE_ORIGIN = 'https://types.drelijah.org';
+export const TYPES_SITE_HOST = new URL(TYPES_SITE_ORIGIN).host;
 
 export const needs = {
   prisma: 'PRisMA compliance (Stage I / II / III)',
