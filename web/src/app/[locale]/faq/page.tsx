@@ -33,7 +33,7 @@ export default function FaqPage() {
       question:
         'How is the Career Interest Checklist different from Career Direct®?',
       answer:
-        'The checklist is a free, 60-activity interest profile from the O*NET® Interest Profiler. Career Direct® is a separate career assessment that Elijah normally uses in 1:1 career coaching. For a lower-cost option, coaching can build on your checklist results instead.'
+        'The checklist is a free, 60-activity interest profile from the O*NET® Interest Profiler. Career Direct® is a separate career assessment that Elijah normally uses in 1:1 career coaching. For a lower-cost option, coaching can build on your checklist results instead. Details and fees: drelijah.org/career-direct'
     },
     {
       question: 'How do I print my test results?',

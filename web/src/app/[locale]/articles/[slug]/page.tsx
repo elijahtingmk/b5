@@ -8,6 +8,7 @@ import { Image } from '@nextui-org/image';
 import { calculateReadingTime } from '@/lib/helpers';
 import { ViewCounter } from '@/components/view-counter';
 import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({ slug: post._raw.flattenedPath }));
@@ -17,14 +18,14 @@ export const generateMetadata = async (props: {
 }) => {
   const params = await props.params;
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
-  if (!post) throw new Error(`Post not found for slug: ${params.slug}`);
+  if (!post) notFound();
   return { title: post.title };
 };
 
 const PostLayout = async (props: { params: Promise<{ slug: string }> }) => {
   const params = await props.params;
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
-  if (!post) throw new Error(`Post not found for slug: ${params.slug}`);
+  if (!post) notFound();
   return (
     <article className='w-full flex flex-col justify-start items-center prose prose-neutral'>
       <div className='w-full max-w-4xl'>

@@ -183,6 +183,13 @@ export default async function RiasecResultPage(props: Props) {
         </Link>
         .
       </p>
+      <p className='mt-4 text-default-600'>
+        Facing a course, career or role decision? Elijah offers{' '}
+        <ExternalLink href='https://drelijah.org/career-direct'>
+          Career &amp; Role-Fit Advisory (Career Direct®)
+        </ExternalLink>
+        , a fuller assessment with a consultation.
+      </p>
 
       <LeadForm resultId={report.id} locale={locale} test='riasec' />
       <OnetAttribution />
