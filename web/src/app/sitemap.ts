@@ -6,7 +6,7 @@ const articles = [
   'conscientiousness',
   'extraversion',
   'neuroticism',
-  'openness',
+  'openness_to_experience',
   'conscientiousness_longevity',
   'bigfive_relationships',
   'personality_diseases',
@@ -26,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       }
     },
     {
-      url: basePath,
+      url: `${basePath}/result`,
       lastModified: new Date(),
       alternates: {
         languages: alternatesPageLang('/result')

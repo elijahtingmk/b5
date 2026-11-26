@@ -3,7 +3,7 @@
 
 // Version of the drelijah.org privacy notice shown beside the form; stored
 // with each enquiry. Change it when that notice changes.
-export const MAIN_SITE_NOTICE_VERSION = '2026-10-04';
+export const MAIN_SITE_NOTICE_VERSION = '2026-10-21';
 
 export const allowedOrigins = [
   'https://drelijah.org',
