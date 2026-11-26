@@ -23,6 +23,7 @@ export const needs = {
   types16: '16-type personality profile',
   bigfive: 'Big Five assessment',
   coaching: '1:1 coaching',
+  'career-direct': 'Career & Role-Fit Advisory (Career Direct®)',
   unsure: 'Not sure yet'
 } as const;
 
