@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { title } from '@/components/primitives';
 import { DomainPage } from './domain';
 import { Domain } from '@bigfive-org/results';
-import { getTranslations } from 'next-intl/server';
+import { pageMeta } from '@/lib/page-meta';
 import { BarChart } from '@/components/bar-chart';
 import { Link } from '@/navigation';
 import { ReportLanguageSwitch } from './report-language-switch';
@@ -17,17 +17,18 @@ import { LeadForm } from './lead-form';
 import { Chip } from '@nextui-org/react';
 
 export async function generateMetadata(props: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const params = await props.params;
+  const { locale, id } = await props.params;
 
-  const { locale } = params;
-
-  const t = await getTranslations({ locale, namespace: 'results' });
-  return {
-    title: t('seo.title'),
-    description: t('seo.description')
-  };
+  return pageMeta({
+    locale,
+    path: `/result/${id}`,
+    title: 'Your Big Five result',
+    description:
+      'Your Big Five personality snapshot. Keep the result ID to open this page again.',
+    noindex: true
+  });
 }
 
 interface ResultPageParams {

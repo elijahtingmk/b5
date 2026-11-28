@@ -5,6 +5,7 @@ import Feedback from './feedback';
 import { Link } from '@/navigation';
 import { practitioner } from '@/config/consent';
 import { siteConfig } from '@/config/site';
+import { pageMeta } from '@/lib/page-meta';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -18,10 +19,12 @@ export async function generateMetadata(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale, namespace: 'toolbar' });
-  return {
+  return pageMeta({
+    locale,
+    path: '/about',
     title: t('about'),
     description: `A free Big Five personality snapshot and career interest checklist offered by ${practitioner.displayName}, ${practitioner.location}.`
-  };
+  });
 }
 
 export default async function AboutPage(props: Props) {

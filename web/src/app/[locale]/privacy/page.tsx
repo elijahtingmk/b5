@@ -1,5 +1,19 @@
 import { title } from '@/components/primitives';
 import { NOTICE_VERSION, practitioner } from '@/config/consent';
+import { pageMeta } from '@/lib/page-meta';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await props.params;
+  return pageMeta({
+    locale,
+    path: '/privacy',
+    title: 'Privacy notice',
+    description:
+      'How Dr Elijah Ting handles Big Five results, optional contact details, and cookies on this site.'
+  });
+}
 
 const mail = (
   <a href={`mailto:${practitioner.email}`} className='underline'>
@@ -221,9 +235,9 @@ export default function PrivacyPage() {
           <p>
             Apabila anda menghantar pertanyaan, butiran anda juga dihantar
             melalui e-mel kepada Elijah dan disalin ke peti masuk pembantu yang
-            selamat yang digunakannya untuk memastikan tiada pertanyaan terlepas.
-            Butiran ini hanya digunakan untuk membalas anda dan tidak akan
-            dijual atau dikongsi untuk tujuan pemasaran.
+            selamat yang digunakannya untuk memastikan tiada pertanyaan
+            terlepas. Butiran ini hanya digunakan untuk membalas anda dan tidak
+            akan dijual atau dikongsi untuk tujuan pemasaran.
           </p>
           <p>
             Sesiapa yang mempunyai ID atau pautan keputusan anda boleh membuka

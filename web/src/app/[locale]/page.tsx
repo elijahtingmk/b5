@@ -19,7 +19,9 @@ import { allPosts } from 'contentlayer/generated';
 import { PostCard } from '@/components/post-card';
 import { SonarPulse } from '@/components/sonar-pulse';
 import { Button } from '@nextui-org/button';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/page-meta';
 import { Chip, Tooltip } from '@nextui-org/react';
 import NextLink from 'next/link';
 import { Link as LocaleLink } from '@/navigation';
@@ -27,6 +29,20 @@ import { Translated } from '@/components/translated';
 
 interface Props {
   params: Promise<{ locale: string }>;
+}
+
+const HOME_DESCRIPTION =
+  'Take a free Big Five personality test from Dr Elijah Ting. Learn your traits and compare with people you know.';
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { locale } = await props.params;
+  const t = await getTranslations({ locale, namespace: 'frontpage' });
+  const translated = t('seo.description');
+  return pageMeta({
+    locale,
+    title: t('seo.title'),
+    description: translated.length <= 155 ? translated : HOME_DESCRIPTION
+  });
 }
 
 export default function Home(props: Props) {
@@ -61,8 +77,7 @@ export default function Home(props: Props) {
     {
       title: t('cards.translated.title'),
       description: t.raw('cards.translated.text'),
-      icon: LanguageIcon({}),
-      href: 'https://b5.translations.alheimsins.net/'
+      icon: LanguageIcon({})
     }
   ];
 
@@ -122,6 +137,10 @@ export default function Home(props: Props) {
               <LocaleLink href='/riasec' className='underline'>
                 Career Interest Checklist (RIASEC)
               </LocaleLink>
+              .{' '}
+              <a href='https://types.drelijah.org' className='underline'>
+                Also try the free 16-type personality test
+              </a>
               .
             </p>
           </div>
@@ -137,7 +156,7 @@ export default function Home(props: Props) {
       </div>
 
       <div className='mt-20 lg:mt-44 text-center'>
-        <h1 className={title()}>{t('compare.title')}</h1>
+        <h2 className={title()}>{t('compare.title')}</h2>
 
         <div className='mt-10'>
           <div className='text-lg lg:text-xl font-normal text-default-500'>
@@ -237,7 +256,7 @@ export default function Home(props: Props) {
 
       <div className='text-center mx-2'>
         <Link href='/articles' color='foreground'>
-          <h1 className={title()}>Latest posts</h1>
+          <h2 className={title()}>Latest posts</h2>
         </Link>
         <h2 className={subtitle({ class: 'mt-4' })}>
           All the latest and greatest news and articles on #personality
