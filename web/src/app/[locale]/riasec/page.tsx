@@ -2,12 +2,20 @@ import { setRequestLocale } from 'next-intl/server';
 import { title } from '@/components/primitives';
 import { OnetAttribution } from '@/components/onet-attribution';
 import { Checklist } from './checklist';
+import { pageMeta } from '@/lib/page-meta';
 
-export const metadata = {
-  title: 'Career Interest Checklist (RIASEC)',
-  description:
-    'Free 60-activity career interest checklist based on the O*NET® Interest Profiler Short Form. See your Holland Code (RIASEC) interest areas.'
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await props.params;
+  return pageMeta({
+    locale,
+    path: '/riasec',
+    title: 'Career Interest Checklist (RIASEC)',
+    description:
+      'Free 60-activity career interest checklist based on the O*NET® Interest Profiler Short Form. See your Holland Code (RIASEC) interest areas.'
+  });
+}
 
 interface Props {
   params: Promise<{ locale: string }>;

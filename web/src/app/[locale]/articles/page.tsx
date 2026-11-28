@@ -2,9 +2,21 @@ import { compareDesc } from 'date-fns';
 import { allPosts } from 'contentlayer/generated';
 import { PostCard } from '@/components/post-card';
 import { setRequestLocale } from 'next-intl/server';
+import { pageMeta } from '@/lib/page-meta';
 
 interface Props {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata(props: Props) {
+  const { locale } = await props.params;
+  return pageMeta({
+    locale,
+    path: '/articles',
+    title: 'Personality articles',
+    description:
+      'Articles on the Big Five traits and how personality shows up in relationships, health, and daily life.'
+  });
 }
 
 export default async function ArticlesPage(props: Props) {

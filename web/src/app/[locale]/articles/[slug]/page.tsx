@@ -9,17 +9,23 @@ import { calculateReadingTime } from '@/lib/helpers';
 import { ViewCounter } from '@/components/view-counter';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
+import { pageMeta } from '@/lib/page-meta';
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({ slug: post._raw.flattenedPath }));
 
 export const generateMetadata = async (props: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) => {
   const params = await props.params;
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
   if (!post) notFound();
-  return { title: post.title };
+  return pageMeta({
+    locale: params.locale,
+    path: `/articles/${params.slug}`,
+    title: post.title,
+    description: post.description
+  });
 };
 
 const PostLayout = async (props: { params: Promise<{ slug: string }> }) => {

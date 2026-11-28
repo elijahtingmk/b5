@@ -12,11 +12,21 @@ import {
 } from '@/config/riasec';
 import { Link } from '@/navigation';
 import { LeadForm } from '../../../result/[id]/lead-form';
+import { pageMeta } from '@/lib/page-meta';
 
-export const metadata = {
-  title: 'Your career interest results',
-  robots: { index: false }
-};
+export async function generateMetadata(props: {
+  params: Promise<{ id: string; locale: string }>;
+}) {
+  const { locale, id } = await props.params;
+  return pageMeta({
+    locale,
+    path: `/riasec/result/${id}`,
+    title: 'Your career interest results',
+    description:
+      'Your Holland Code (RIASEC) career interest results from the free checklist.',
+    noindex: true
+  });
+}
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;

@@ -5,8 +5,22 @@ import { useTranslations } from 'next-intl';
 import { saveTest } from '@/actions';
 import { setRequestLocale } from 'next-intl/server';
 import { TestLanguageSwitch } from './test-language-switch';
+import { pageMeta } from '@/lib/page-meta';
 
 const questionLanguages = getInfo().languages;
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await props.params;
+  return pageMeta({
+    locale,
+    path: '/test',
+    title: 'Take the Big Five test',
+    description:
+      '120 questions, about 10 minutes, no registration. A free Big Five personality snapshot from Dr Elijah Ting.'
+  });
+}
 
 interface Props {
   params: Promise<{ locale: string }>;
